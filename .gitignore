@@ -1,0 +1,13 @@
+.DS_Store
+.tags
+
+build
+docker/build
+
+*/debug
+codegen
+*.pyc
+*.egg-info
+*node_modules
+vendor/
+coverage
