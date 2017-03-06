@@ -1,6 +1,7 @@
 import parse5 from 'parse5';
 import _ from 'lodash';
 import rp from 'request-promise';
+import { translate } from './translate';
 
 import { findNearestColor } from './color';
 
@@ -56,11 +57,12 @@ function translateNgaNode(node, context) {
   if (node.nodeName === '#text') {
     const replaced = node.value
     .replace('’', '\'')
-    .replace('ú', 'u')
     .replace(String.fromCharCode(10), ' ')
     ;
     const result = _.trim(replaced);
-    return result;
+    const translated = translate(result);
+    return translated
+    .replace('ú', 'u');
   }
   // Node types to skip
   if (['style', 'script', '#comment', 'font'].includes(node.nodeName)) {
