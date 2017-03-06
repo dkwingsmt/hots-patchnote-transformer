@@ -2,6 +2,8 @@ import parse5 from 'parse5';
 import _ from 'lodash';
 import rp from 'request-promise';
 
+import { findNearestColor } from './color';
+
 function getPage(url) {
   return rp(url);
 }
@@ -32,6 +34,24 @@ function getArticleTree(htmlText) {
   return articleTree;
 }
 
+function parseStyle(node) {
+  if (!node.attrs) {
+    return {};
+  }
+  const styleAttr = node.attrs.find(v => v.name === 'style');
+  if (!styleAttr) {
+    return {};
+  }
+  const styles = styleAttr.value
+    .split(';')
+    .map(s => _.trim(s))
+    .filter(Boolean)
+    .map(s => s.split(':'))
+    .map(([a, b]) => [_.trim(a), _.trim(b)])
+    .filter(v => v.length === 2);
+  return _.fromPairs(styles);
+}
+
 function translateNgaNode(node, context) {
   if (node.nodeName === '#text') {
     const replaced = node.value
@@ -46,8 +66,20 @@ function translateNgaNode(node, context) {
   if (['style', 'script', '#comment', 'font'].includes(node.nodeName)) {
     return '';
   }
-  const children = translateNgaNodeList(node.childNodes);
+  const style = parseStyle(node);
+  const childrenRaw = translateNgaNodeList(node.childNodes);
+  let children = childrenRaw;
+  if (style.color) {
+    const ngaColor = findNearestColor(style.color);
+    if (ngaColor) {
+      children = `[color=${ngaColor}]${children}[/color]`;
+    }
+  }
   switch (node.nodeName) {
+  case 'br':
+    return '\n';
+  case 'figure':
+    return `\n${children}\n`;
   case 'table':
     return `\n[${node.nodeName}]${children}\n[/${node.nodeName}]\n`;
   case 'tbody':
@@ -94,9 +126,10 @@ function translateNgaNode(node, context) {
     const prefix = context.$prev ? '' : '\n';
     return `\n${prefix}[list]${children}\n[/list]\n`;
   }
-  case 'ol':
+  case 'ol': {
     const prefix = context.$prev ? '' : '\n';
     return `\n${prefix}[list=1]${children}\n[/list]\n`;
+  }
   case 'li': {
     const prefix = context.$prev ? '\n' : '';
     return `${prefix}[*]${children}`;
@@ -107,6 +140,7 @@ function translateNgaNode(node, context) {
     if (src) {
       return `\n[img]${src.value}[/img]\n`;
     }
+    return '';
   }
 
   default:
@@ -148,7 +182,7 @@ function serializeToNga(tree) {
   return translateNgaNode(tree);
 }
 
-getPage('http://us.battle.net/heroes/en/blog/20581815/heroes-of-the-storm-balance-update-february-27-2017-2-27-2017')
+getPage('http://us.battle.net/heroes/en/blog/20554028/heroes-of-the-storm-patch-notes-february-14-2017-2-14-2017')
 .then(getArticleTree)
 .then(serializeToNga)
 .then(console.log);

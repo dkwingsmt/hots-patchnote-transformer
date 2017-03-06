@@ -14,8 +14,10 @@
   },
   "dependencies": {
     "bluebird": "^3.4.6",
+    "color-space": "^1.14.7",
     "core-js": "^2.4.1",
-    "lodash": "^4.16.2",
+    "delta-e": "0.0.7",
+    "lodash": "^4.17.4",
     "parse5": "^3.0.2",
     "request": "^2.79.0",
     "request-promise": "^4.1.1"
