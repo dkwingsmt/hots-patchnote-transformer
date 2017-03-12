@@ -57,6 +57,7 @@ function translateNgaNode(node, context) {
   if (node.nodeName === '#text') {
     const replaced = node.value
     .replace('’', '\'')
+    .replace('​', ' ')
     .replace(String.fromCharCode(10), ' ')
     ;
     const result = _.trim(replaced);
@@ -184,7 +185,7 @@ function serializeToNga(tree) {
   return translateNgaNode(tree);
 }
 
-getPage('http://us.battle.net/heroes/en/blog/20554028/heroes-of-the-storm-patch-notes-february-14-2017-2-14-2017')
+getPage('http://us.battle.net/heroes/en/blog/20581817/')
 .then(getArticleTree)
 .then(serializeToNga)
 .then(console.log);
