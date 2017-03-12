@@ -2,12 +2,12 @@ import _ from 'lodash';
 import i18nDict from './i18n';
 
 function splitBracket(origin) {
-  const bracketResult = /^(.*?)( *)\(([^)]*)\)$/g.exec(origin);
+  const bracketResult = /^(.*?)( *)\(([^)]*)\)( *)(.*?)$/g.exec(origin);
   if (bracketResult) {
-    const [o, body1, space, body2] = bracketResult;
+    const [o, body1, space1, body2, space2, body3] = bracketResult;
     return [
-      [body1, body2],
-      ([tBody1, tBody2]) => `${tBody1}${space}(${tBody2})`,
+      [body1, body2, body3],
+      ([tBody1, tBody2, tBody3]) => `${tBody1}${space1}(${tBody2})${space2}${tBody3}`,
     ];
   }
   return null;
@@ -25,12 +25,24 @@ function splitColon(origin) {
   return null;
 }
 
+function splitXXXTalents(origin) {
+  const bracketResult = /^(.*?) talents$/g.exec(origin.toLowerCase());
+  if (bracketResult) {
+    const [o, name] = bracketResult;
+    return [
+      [name],
+      ([tName]) => `${tName}天赋`,
+    ];
+  }
+  return null;
+}
+
 function statItems(o) {
   const dict = {
     'cooldown': '冷却时间',
     'radius': '半径',
     'health': '生命值',
-    'basic maximum health': '基础最大生命值',
+    'base maximum health': '基础最大生命值',
     'maximum base health': '基础最大生命值',
     'healing': '治疗量',
     'heal': '治疗量',
@@ -55,6 +67,9 @@ function statItems(o) {
     'duration bonus per attack': '每次攻击增加的持续时间',
     'ghoul attack damage': '食尸鬼攻击速度',
     'ghoul health': '食尸鬼生命',
+    'search arc': '搜寻弧度',
+    'maximum dash range': '最大冲刺距离',
+    'full charge up duration': '最大蓄力时间',
   };
   return _.get(dict, _.trim(o.replace('the ', '').toLowerCase()), _.trim(o));
 }
@@ -73,12 +88,14 @@ function translatePreset(origin) {
     [/^Moved to Level (\d*)$/i, '移到$1级'],
     [/^(.*) (reduced|lowered|decreased) from ([\d.]*) ?([^ ]*) to ([\d.]*)(.*)$/g,
       (r) => `${statItems(r[1])}从${r[3]}${statUnits(r[4])}降低到${r[5]}${statUnits(r[6])}`],
-    [/^(Decrease|Lowere|Reduce)d? (.*) from ([\d.]*) ?([^ ]*) to ([\d.]*)(.*)$/g,
+    [/^(Decrease|Lowere|Reduce)d?s? (.*) from ([\d.]*) ?([^ ]*) to ([\d.]*)(.*)$/g,
       (r) => `${statItems(r[2])}从${r[3]}${statUnits(r[4])}降低到${r[5]}${statUnits(r[6])}`],
     [/^(.*) (increased) from ([\d.]*) ?([^ ]*) to ([\d.]*)(.*)$/g,
       (r) => `${statItems(r[1])}从${r[3]}${statUnits(r[4])}增加到${r[5]}${statUnits(r[6])}`],
-    [/^(Increase) (.*) from ([\d.]*) ?([^ ]*) to ([\d.]*)(.*)$/g,
+    [/^(Increase)d?s? (.*) from ([\d.]*) ?([^ ]*) to ([\d.]*)(.*)$/g,
       (r) => `${statItems(r[2])}从${r[3]}${statUnits(r[4])}增加到${r[5]}${statUnits(r[6])}`],
+    [/^([+.0-9]+) ?(physical|spell)? armor$/gi,
+      (r) => `${r[1]}${{ physical: '物理', spell: '法术' }[r[2].toLowerCase()]}护甲`],
   ];
   let result = origin;
   const validre = regexps.find(([re]) => re.exec(origin));
@@ -136,6 +153,8 @@ function translatePreset(origin) {
     'new': '新',
     'moved': '移动了的',
     'talent.': '天赋',
+    'level': '等级',
+    'tier': '天赋层级',
   };
   _.map(presets, (to, from) => {
     if (_.trim(origin.toLowerCase()) === from) {
@@ -157,7 +176,7 @@ function translateToken(origin) {
 
 function translatePhrase(origin) {
   let validSplit;
-  _.forEach([splitBracket, splitColon], splitMethod => {
+  _.forEach([splitBracket, splitColon, splitXXXTalents], splitMethod => {
     const splitResult = splitMethod(origin);
     if (splitResult) {
       validSplit = splitResult;
