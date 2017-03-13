@@ -37,7 +37,8 @@ function splitColon(origin) {
 }
 
 function splitDash(origin) {
-  const bracketResult = /^(.*?)( +[–-] +)(.*)$/g.exec(origin);
+  const bracketResult = /^(.*?)( +[—–-] +)(.*)$/g.exec(origin);
+
   if (bracketResult) {
     const [o, body1, mid, body2] = bracketResult;
     return [
@@ -84,6 +85,10 @@ function statItems(o) {
     'health regen': '生命恢复速度',
     'basic attack damage': '普攻伤害',
     'mana cost': '法力消耗',
+    'energy cost': '能量消耗',
+    'teleport range': '传送距离',
+    'explosion radius': '爆炸范围',
+    'movement speed': '移动速度',
     'cast range': '施放距离',
     'charges': '可储存次数',
     'cooldown reduction': '冷却时间减少量',
@@ -92,16 +97,34 @@ function statItems(o) {
     'ghoul health': '食尸鬼生命',
     'search arc': '搜寻弧度',
     'vision range': '视野范围',
+    'stun duration': '昏迷持续时间',
+    'duration': '持续时间',
+    'damage over time': '持续伤害',
+    'impact damage': '直接伤害',
+    'silence duration': '沉默持续时间',
     'maximum dash range': '最大冲刺距离',
     'full charge up duration': '最大蓄力时间',
+    'maximum charge count': '最大储存层数',
+    'damage per second': '每秒伤害',
+    'basic attack range': '普通攻击范围',
+    'basic attack slow': '普通攻击减速效果',
+    'window between casts': '每次施法之间的最大时间间隔',
+    'bonus health': '生命值加成',
+    'sight radius bonus': '视野范围加成',
+    'movement speed bonus': '移动速度加成',
   };
-  return _.get(dict, _.trim(o.replace('the ', '').toLowerCase()), _.trim(o));
+  return _.get(dict, _.trim(o.toLowerCase()).replace('the ', ''), _.trim(o));
 }
 
 function statUnits(o) {
   const dict = {
     'seconds': '秒',
+    'games': '场游戏',
+    'stacks': '层',
     'seconds.': '秒',
+    'per second': '每秒',
+    'per stack': '每层',
+    'range': '',
   };
   return _.get(dict, _.trim(o.toLowerCase()), _.trim(o));
 }
@@ -122,9 +145,10 @@ function translatePreset(origin) {
   const regexps = [
     [/^Level (\d*)$/i, '$1级'],
     [/^Moved to Level (\d*)$/i, '移到$1级'],
-    [/^heroes of the storm (ptr )?patch notes$/i, (r) => `《风暴英雄》${ifExist(r[1], '公开测试服')}更新说明}`],
+    [/^heroes of the storm (ptr )?patch notes$/gi, (r) => `《风暴英雄》${ifExist(r[1], '公开测试服')}更新说明`],
     [/^now (.*)$/i, (r) => `现在${translatePhrase(r[1])}`],
     [/^also (.*)$/i, (r) => `还会${translatePhrase(r[1])}`],
+    [/^renamed to (.*)$/i, (r) => `重命名为${translatePhrase(r[1])}`],
     [/^(.*) (reduce|lower|decrease|increase)s?(?:e?d)? from ([\d.]*) ?([^ ]*) to ([\d.]*)(.*)$/ig,
       (r) => `${statItems(r[1])}从${r[3]}${statUnits(r[4])}${buffAction(r[2])}到${r[5]}${statUnits(r[6])}`],
     [/^(reduce|lower|decrease|increase)s?(?:e?d)? (.*) from ([\d.]*) ?([^ ]*) to ([\d.]*)(.*)$/ig,
@@ -135,11 +159,13 @@ function translatePreset(origin) {
       (r) => `${translatePhrase(r[2])}${ifExist(r[2], '的')}${statItems(r[1])}${ifExist(r[4], '额外')}${buffAction(r[3])}了${r[5]}${statUnits(r[6])}`],
     [/^(grants? ?)([+.0-9]+) ?(physical|spell)? armor$/gi,
       (r) => `${ifExist(r[1], '给予')}${r[2]}${ifExist(r[3], s => ({ physical: '物理', spell: '法术' })[s.toLowerCase()])}护甲`],
+    [/^(.*)'s prices will be reduced to ([\d,]+) Gold and \$([\d,.]+) USD.$/ig,
+      (r) => `${translatePhrase(r[1])}的价格降低为${r[2]}金币或${r[3]}美元.`],
     [/^(.+) has received updated visual effects$/gi,
       (r) => `${translatePhrase(r[1])}的视觉效果得到了改进`],
     [/^Available until (.+)$/gi,
       (r) => `限时出售至${translatePhrase(r[1])}`],
-    [/^(january|feburary|march|april|may|june|july|august|september|october|november|december) (\d+), (\d+)$/gi,
+    [/^(january|february|march|april|may|june|july|august|september|october|november|december) (\d+), (\d+)$/gi,
       (r) => moment(r[0], 'MMM, D, YYYY').format('YYYY年M月D日')],
   ];
   let result = origin;
@@ -164,6 +190,7 @@ function translatePreset(origin) {
     'stats': '数据',
     'talents': '天赋',
     'developer comment': '设计师观点',
+    'developer comments': '设计师观点',
     'ptr note': '测试服注释',
     'general': '综合',
     'art': '美术',
@@ -188,12 +215,14 @@ function translatePreset(origin) {
     'assassin': '刺杀型',
     'multi-class': '混合型',
     'specialist': '专业型',
+    'support': '辅助型',
     'warrior': '战斗型',
     'quest': '任务',
     '!quest': '任务',
     'reward': '奖励',
     '!reward': '奖励',
-    'indicates a questing talent.': '代表该天赋为任务天赋。',
+    'rewards': '奖励',
+    'indicates a questing talent.': '代表该天赋为任务天赋.',
     'italic text': '斜体字',
     'bold text': '粗体字',
     'indicates a': '代表',
@@ -206,6 +235,7 @@ function translatePreset(origin) {
     'battlegrounds': '战场',
     'in-game user interface': '游戏界面',
     'sounds': '声音',
+    'sound': '声音',
     'heroes, abilities, and talents': '英雄、技能和天赋',
     'basic abilities': '基本技能',
     'heroic abilities': '终极技能',
@@ -214,6 +244,8 @@ function translatePreset(origin) {
       '以下英雄、技能和天赋获得了视觉效果更新',
     'the following heroes have received updated icon art to coincide with their reworks':
       '以下英雄的技能图标和视觉效果已经更新，与他的新设计保持一致',
+    'has received updated icon art and visual effects that coincide with his rework.':
+      '的技能图标和视觉效果已经更新，与他的新设计保持一致',
     'has been added to the in-game shop': '已被添加到游戏商城',
     'moved to': '移到了',
     'new functionality': '新效果',
@@ -222,6 +254,10 @@ function translatePreset(origin) {
     'redesigned': '重新设计',
     'new ability': '新技能',
     'new active': '新主动激活效果',
+    'heroes of the storm': '风暴英雄',
+    'world of warcraft': '魔兽世界',
+    'price reduction': '价格变动',
+    'heroes brawl': '风暴乱斗',
   };
   _.map(presets, (to, from) => {
     if (_.trim(origin.toLowerCase()) === from) {

@@ -39,9 +39,16 @@ Promise.join(
     const dict = {};
     _.forEach(fromArray, ([key, fromBody]) => {
       if ([
-        'Description',
-        'Tooltip',
-        'Expression',
+        'Character/Description/',
+        'Hero/Description/',
+        'Button/Tooltip/',
+        'Goal/',
+        'VoiceLine/',
+        'Behavior/',
+        'Talent/',
+        'Param/Expression/',
+        'UserData/',
+        'Button/Simple/',
         'Param/Value/',
         'Reward/',
         'Skin/Info',
@@ -60,7 +67,9 @@ Promise.join(
         'Hero/AlternateNameSearchText',
         'Error/',
         'Button/SimpleDisplayText/',
-      ].some((forbidden) => key.includes(forbidden))) {
+      ].some((forbidden) => key.startsWith(forbidden)) && [
+        'UI/MapLoadingScreen',
+      ].every((allowedException) => !key.startsWith(allowedException))) {
         return;
       }
       const toBody = toDict[key];
@@ -72,7 +81,7 @@ Promise.join(
         if (!trimmedFromBody) {
           return;
         }
-        if (['<lang rule'].includes(trimmedFromBody)) {
+        if (['<lang rule', 'Heroes of the Storm'].includes(trimmedFromBody)) {
           return;
         }
         const postFromBody = JSON.stringify(trimmedFromBody.toLowerCase());

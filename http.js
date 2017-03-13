@@ -59,6 +59,7 @@ function translateNgaNode(node, context) {
     .replace('’', '\'')
     .replace('​', ' ')
     .replace(String.fromCharCode(10), ' ')
+    .replace(String.fromCharCode(8203), ' ')
     ;
     const result = _.trim(replaced);
     const translated = translate(result);
