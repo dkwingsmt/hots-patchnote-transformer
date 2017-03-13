@@ -68,10 +68,14 @@ Promise.join(
         if (fromBody === toBody) {
           return;
         }
-        const postFromBody = JSON.stringify(_.trim(fromBody).toLowerCase());
-        if (!_.trim(fromBody)) {
+        const trimmedFromBody = _.trim(fromBody);
+        if (!trimmedFromBody) {
           return;
         }
+        if (['<lang rule'].includes(trimmedFromBody)) {
+          return;
+        }
+        const postFromBody = JSON.stringify(trimmedFromBody.toLowerCase());
         const postToBody = _.trim(toBody);
         const dictValue = dict[postFromBody] || [];
         const duplicateItem = dictValue.find(([body]) => body === postToBody);
@@ -81,6 +85,9 @@ Promise.join(
           dictValue.push([postToBody, key]);
         }
         dict[postFromBody] = dictValue;
+        // if (dictValue.length !== 1) {
+        //   console.log(postFromBody, dictValue);
+        // }
       }
     });
     return dict;
