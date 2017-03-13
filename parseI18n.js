@@ -69,7 +69,7 @@ Promise.join(
           return;
         }
         const postFromBody = JSON.stringify(_.trim(fromBody).toLowerCase());
-        if (!postFromBody) {
+        if (!_.trim(fromBody)) {
           return;
         }
         const postToBody = _.trim(toBody);
