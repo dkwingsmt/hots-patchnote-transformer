@@ -67,6 +67,11 @@ Promise.join(
         'Hero/AlternateNameSearchText',
         'Error/',
         'Button/SimpleDisplayText/',
+        'Emoticon/',
+        'Skin/AdditionalSearchText/',
+        'Mount/AdditionalSearchText/',
+        'EmoticonPack/Description/',
+        'Banner/Description/',
       ].some((forbidden) => key.startsWith(forbidden)) && [
         'UI/MapLoadingScreen',
       ].every((allowedException) => !key.startsWith(allowedException))) {

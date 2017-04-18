@@ -112,6 +112,9 @@ function statItems(o) {
     'bonus health': '生命值加成',
     'sight radius bonus': '视野范围加成',
     'movement speed bonus': '移动速度加成',
+    'base health regen': '基础生命回复',
+    'healing amount': '治疗量',
+    'healing bonus': '治疗量加成',
   };
   return _.get(dict, _.trim(o.toLowerCase()).replace('the ', ''), _.trim(o));
 }
