@@ -68,6 +68,9 @@ function statItems(o) {
     'health': '生命值',
     'base maximum health': '基础最大生命值',
     'maximum base health': '基础最大生命值',
+    'base health': '基础生命值',
+    'base health regeneration': '基础生命回复',
+    'health bonus': '生命值加成',
     'healing': '治疗量',
     'heal': '治疗量',
     'heal amount': '治疗量',
@@ -101,6 +104,7 @@ function statItems(o) {
     'duration': '持续时间',
     'damage over time': '持续伤害',
     'impact damage': '直接伤害',
+    'armor bonus': '护甲加成',
     'silence duration': '沉默持续时间',
     'maximum dash range': '最大冲刺距离',
     'full charge up duration': '最大蓄力时间',
@@ -112,12 +116,26 @@ function statItems(o) {
     'bonus health': '生命值加成',
     'sight radius bonus': '视野范围加成',
     'movement speed bonus': '移动速度加成',
+    'damage threshold': '伤害阈值',
+    'bonus damage': '伤害加成',
+    'damage bonus': '伤害加成',
+    'vision bonus': '视野加成',
+    'armor duration': '护甲持续时间',
+    'range': '范围',
+    'life leech': '生命吸取比例',
+    'bonus life leech': '生命吸取比例加成',
+    'splash damage': '溅射伤害',
+    'healing amount': '治疗量',
+    'bonus swing damage': '伤害加成',
+    'increased movement speed duration': '加速持续时间',
+    'bonus shield amount': '护盾量加成',
   };
   return _.get(dict, _.trim(o.toLowerCase()).replace('the ', ''), _.trim(o));
 }
 
 function statUnits(o) {
   const dict = {
+    'second': '秒',
     'seconds': '秒',
     'games': '场游戏',
     'stacks': '层',
@@ -125,6 +143,10 @@ function statUnits(o) {
     'per second': '每秒',
     'per stack': '每层',
     'range': '',
+    '% max health': '最大生命值',
+    '% maximum health': '最大生命值',
+    '% of maximum health': '最大生命值',
+    '% maximum health': '最大生命值',
   };
   return _.get(dict, _.trim(o.toLowerCase()), _.trim(o));
 }
@@ -240,6 +262,7 @@ function translatePreset(origin) {
     'basic abilities': '基本技能',
     'heroic abilities': '终极技能',
     'return to top': '',
+    'heroes of the storm balance update': '《风暴英雄》平衡更新说明',
     'the following heroes, abilities, and talents have received updated visual effects':
       '以下英雄、技能和天赋获得了视觉效果更新',
     'the following heroes have received updated icon art to coincide with their reworks':

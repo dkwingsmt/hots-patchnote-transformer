@@ -82,6 +82,8 @@ function translateNgaNode(node, context) {
   switch (node.nodeName) {
   case 'br':
     return '\n';
+  case 'hr':
+    return '\n======\n';
   case 'figure':
     return `\n${children}\n`;
   case 'table':
@@ -119,6 +121,8 @@ function translateNgaNode(node, context) {
   case 'strong':
   case 'b':
     return children ? `[b]${children}[/b]` : '';
+  case 's':
+    return children ? `[del]${children}[/del]` : '';
   case 'em':
   case 'i':
     return `[i]${children}[/i]`;
@@ -186,7 +190,7 @@ function serializeToNga(tree) {
   return translateNgaNode(tree);
 }
 
-getPage('http://us.battle.net/heroes/en/blog/20581817/')
+getPage('http://us.battle.net/heroes/en/blog/20721900')
 .then(getArticleTree)
 .then(serializeToNga)
 .then(console.log);
