@@ -82,6 +82,8 @@ function translateNgaNode(node, context) {
   switch (node.nodeName) {
   case 'br':
     return '\n';
+  case 'hr':
+    return '\n======\n';
   case 'figure':
     return `\n${children}\n`;
   case 'table':
@@ -119,9 +121,15 @@ function translateNgaNode(node, context) {
   case 'strong':
   case 'b':
     return children ? `[b]${children}[/b]` : '';
+  case 's':
+    return children ? `[del]${children}[/del]` : '';
   case 'em':
   case 'i':
     return `[i]${children}[/i]`;
+  case 'sup':
+    return `[sup]${children}[/sup]`;
+  case 'sub':
+    return `[sub]${children}[/sub]`;
   case 'blockquote':
     return `\n[quote]\n${children}\n[/quote]`;
   case 'article':
@@ -186,7 +194,7 @@ function serializeToNga(tree) {
   return translateNgaNode(tree);
 }
 
-getPage('http://us.battle.net/heroes/en/blog/20581817/')
+getPage('http://us.battle.net/heroes/en/blog/20766460/heroes-of-the-storm-ptr-notes-may-8-2017-5-8-2017')
 .then(getArticleTree)
 .then(serializeToNga)
 .then(console.log);
