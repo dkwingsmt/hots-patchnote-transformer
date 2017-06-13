@@ -6,7 +6,7 @@ import { translate } from './translate';
 import { findNearestColor } from './color';
 
 function getPage(url) {
-  return rp(url);
+  return rp(url).then(htmlText => ({htmlText, url}));
 }
 
 function getArticleTreeTraverse(tree) {
@@ -26,13 +26,13 @@ function getArticleTreeTraverse(tree) {
   return result;
 }
 
-function getArticleTree(htmlText) {
+function getArticleTree({url, htmlText}) {
   const htmlTree = parse5.parse(htmlText);
   const articleTree = getArticleTreeTraverse(htmlTree);
   if (!articleTree) {
     throw new Error('Can\'t find the article.');
   }
-  return articleTree;
+  return {tree: articleTree, url};
 }
 
 function parseStyle(node) {
@@ -190,11 +190,13 @@ function translateNgaNodeList(nodes) {
   .replace(/:$/g, ': ');
 }
 
-function serializeToNga(tree) {
-  return translateNgaNode(tree);
+function serializeToNga({tree, url}) {
+  return `[quote]英文日志：${url}
+[/quote]
+` + translateNgaNode(tree);
 }
 
-getPage('http://us.battle.net/heroes/en/blog/20766460/heroes-of-the-storm-ptr-notes-may-8-2017-5-8-2017')
+getPage('http://us.battle.net/heroes/en/blog/20838723/heroes-of-the-storm-patch-notes-june-13-2017-6-13-2017')
 .then(getArticleTree)
 .then(serializeToNga)
 .then(console.log);

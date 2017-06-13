@@ -131,6 +131,13 @@ function statItems(o) {
     'bonus swing damage': '伤害加成',
     'increased movement speed duration': '加速持续时间',
     'bonus shield amount': '护盾量加成',
+    'cooldown reduction per basic attack': '每次普通攻击减少的冷却时间',
+    'attack speed': '普通攻击速度',
+    'attack damage': '普通攻击伤害',
+    'bounce damage': '弹跳伤害',
+    'root duration': '定身时间',
+    'movement speed slow': '移动速度减速效果',
+    'life steal amount': '生命吸取量',
   };
   return _.get(dict, _.trim(o.toLowerCase()).replace('the ', ''), _.trim(o));
 }
@@ -189,7 +196,7 @@ function translatePreset(origin) {
     [/^Available until (.+)$/gi,
       (r) => `限时出售至${translatePhrase(r[1])}`],
     [/^(january|february|march|april|may|june|july|august|september|october|november|december) (\d+), (\d+)$/gi,
-      (r) => moment(r[0], 'MMM, D, YYYY').format('YYYY年M月D日')],
+      (r) => moment(r[0], 'MMM D, YYYY').format('YYYY年M月D日')],
   ];
   let result = origin;
   const validre = regexps.find(([re]) => re.exec(origin));
@@ -282,6 +289,15 @@ function translatePreset(origin) {
     'world of warcraft': '魔兽世界',
     'price reduction': '价格变动',
     'heroes brawl': '风暴乱斗',
+    'emojis': '表情',
+    'try mode': '试用模式',
+    'mercenaries': '雇佣兵',
+    'dot effects': '持续伤害效果',
+    'basic attacks': '普通攻击',
+    'quick cast': '快速施法',
+    'emoji': '表情',
+    'loot chests': '战利品',
+    'collection': '收藏',
   };
   _.map(presets, (to, from) => {
     if (_.trim(origin.toLowerCase()) === from) {
