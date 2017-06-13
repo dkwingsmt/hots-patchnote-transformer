@@ -37,7 +37,8 @@ Promise.join(
   (fromArray, toArray) => {
     const toDict = _.fromPairs(toArray);
     const dict = {};
-    _.forEach(fromArray, ([key, fromBody]) => {
+    _.forEach(fromArray, ([keyRaw, fromBody]) => {
+      const key = keyRaw.replace(/[\u{FEFF}]/ug, '');
       if ([
         'Character/Description/',
         'Hero/Description/',
@@ -72,6 +73,7 @@ Promise.join(
         'Mount/AdditionalSearchText/',
         'EmoticonPack/Description/',
         'Banner/Description/',
+        'CollectionCategory/',
       ].some((forbidden) => key.startsWith(forbidden)) && [
         'UI/MapLoadingScreen',
       ].every((allowedException) => !key.startsWith(allowedException))) {
