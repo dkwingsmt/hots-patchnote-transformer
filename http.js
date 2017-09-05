@@ -196,7 +196,7 @@ function serializeToNga({tree, url}) {
 ` + translateNgaNode(tree);
 }
 
-getPage('http://us.battle.net/heroes/en/blog/20838723/heroes-of-the-storm-patch-notes-june-13-2017-6-13-2017')
+getPage('http://tw.battle.net/heroes/zh/blog/21016370')
 .then(getArticleTree)
 .then(serializeToNga)
 .then(console.log);
