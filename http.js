@@ -196,7 +196,7 @@ function serializeToNga({tree, url}) {
 ` + translateNgaNode(tree);
 }
 
-getPage('http://tw.battle.net/heroes/zh/blog/21016370')
+getPage('http://us.battle.net/heroes/en/blog/21072302')
 .then(getArticleTree)
 .then(serializeToNga)
 .then(console.log);
