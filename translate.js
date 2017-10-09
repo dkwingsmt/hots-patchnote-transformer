@@ -123,7 +123,7 @@ function statItems(o) {
     'damage bonus': '伤害加成',
     'vision bonus': '视野加成',
     'slow duration': '减速效果持续时间',
-    'miscellaneous': '一般',
+    'miscellaneous': '综合',
     'damage reduction': '伤害减少量',
     'heal reduction': '治疗降低效果',
     'armor duration': '护甲持续时间',
@@ -317,7 +317,7 @@ function translatePreset(origin) {
     'ranked battleground rotation update': '排名对战战场轮替更新',
     'added to rotation': '新增至轮替列表',
     'removed from rotation': '自轮替列表移除',
-    'the full ranked battleground rotation is now as follows': '完整的排名对战战场轮替列表如下：',
+    'the full ranked battleground rotation is now as follows': '完整的排名对战战场轮替列表如下',
     'the ranked map rotation has been updated to include the following': '排位赛地图轮换已更新',
     'heroes of the storm ptr notes': '《风暴英雄》公开测试服补丁说明',
   };
