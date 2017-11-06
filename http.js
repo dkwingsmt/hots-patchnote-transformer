@@ -6,12 +6,25 @@ import { translate } from './translate';
 import { findNearestColor } from './color';
 
 function getPage(url) {
-  return rp(url);
+  return rp(url).then(htmlText => ({ htmlText, url }));
 }
 
 function getArticleTreeTraverse(tree) {
   if (tree.nodeName === 'article') {
     return tree;
+  }
+  if (tree.attrs) {
+    const classAttr = tree.attrs.find(v => v.name === 'class');
+    if (classAttr && classAttr.value.includes('notes-detail')) {
+      return tree;
+    }
+    if (classAttr && classAttr.value.includes('news_area')) {
+      return tree;
+    }
+    const idAttr = tree.attrs.find(v => v.name === 'id');
+    if (idAttr && idAttr.value === 'mainNews') {
+      return tree;
+    }
   }
   let result;
   _.forEach(tree.childNodes, (node) => {
@@ -26,13 +39,13 @@ function getArticleTreeTraverse(tree) {
   return result;
 }
 
-function getArticleTree(htmlText) {
+function getArticleTree({ url, htmlText }) {
   const htmlTree = parse5.parse(htmlText);
   const articleTree = getArticleTreeTraverse(htmlTree);
   if (!articleTree) {
     throw new Error('Can\'t find the article.');
   }
-  return articleTree;
+  return { tree: articleTree, url };
 }
 
 function parseStyle(node) {
@@ -53,6 +66,17 @@ function parseStyle(node) {
   return _.fromPairs(styles);
 }
 
+function getNumAttr(node, attr) {
+  if (!node.attrs) {
+    return null;
+  }
+  const attrObj = node.attrs.find(v => v.name === attr);
+  if (!attrObj) {
+    return null;
+  }
+  return attrObj.value;
+}
+
 function translateNgaNode(node, context) {
   if (node.nodeName === '#text') {
     const replaced = node.value
@@ -65,6 +89,10 @@ function translateNgaNode(node, context) {
     const translated = translate(result);
     return translated
     .replace('ú', 'u');
+  }
+  // <picture>: pick only the first child
+  if (node.nodeNames === 'picture') {
+    node.childNodes = node.childNodes.slice(0, 1);
   }
   // Node types to skip
   if (['style', 'script', '#comment', 'font'].includes(node.nodeName)) {
@@ -94,8 +122,14 @@ function translateNgaNode(node, context) {
   case 'tr':
     return `\n[${node.nodeName}]${children}\n[/${node.nodeName}]`;
   case 'th':
-  case 'td':
-    return `\n[td]${children}[/td]`;
+  case 'td': {
+    const colspan = getNumAttr(node, 'colspan');
+    const colspanStr = colspan ? ` colspan=${colspan}` : '';
+    const rowspan = getNumAttr(node, 'rowspan');
+    const rowspanStr = rowspan ? ` rowspan=${rowspan}` : '';
+    // const boldChildren = node.nodeName === 'th' ? `[b]${children}[/b]` : children;
+    return `\n[td${rowspanStr}${colspanStr}]${children}[/td]`;
+  }
   case 'h1':
   case 'h2':
   case 'h3':
@@ -111,6 +145,7 @@ function translateNgaNode(node, context) {
     return children ? `\n[size=${sizes[node.nodeName]}%][b]${children}[/b][/size]\n` : '';
   }
 
+  case 'picture':
   case 'span':
   case 'a':
   case 'div':
@@ -123,6 +158,8 @@ function translateNgaNode(node, context) {
     return children ? `[b]${children}[/b]` : '';
   case 's':
     return children ? `[del]${children}[/del]` : '';
+  case 'u':
+    return children ? `[u]${children}[/u]` : '';
   case 'em':
   case 'i':
     return `[i]${children}[/i]`;
@@ -190,8 +227,10 @@ function translateNgaNodeList(nodes) {
   .replace(/:$/g, ': ');
 }
 
-function serializeToNga(tree) {
-  return translateNgaNode(tree);
+function serializeToNga({ tree, url }) {
+  return `[quote]英文日志：${url}
+[/quote]
+${translateNgaNode(tree)}`;
 }
 
 getPage('http://us.battle.net/heroes/en/blog/21072302')
