@@ -1,4 +1,4 @@
-import parse5 from 'parse5';
+﻿import parse5 from 'parse5';
 import _ from 'lodash';
 import rp from 'request-promise';
 import { translate } from './translate';
@@ -233,7 +233,7 @@ function serializeToNga({ tree, url }) {
 ${translateNgaNode(tree)}`;
 }
 
-getPage('http://us.battle.net/heroes/en/blog/21072302')
+getPage('http://us.battle.net/heroes/en/blog/21179026/heroes-of-the-storm-ptr-notes-november-6-2017-11-6-2017')
 .then(getArticleTree)
 .then(serializeToNga)
 .then(console.log);
