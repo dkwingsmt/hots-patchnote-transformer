@@ -228,12 +228,14 @@ function translateNgaNodeList(nodes) {
 }
 
 function serializeToNga({ tree, url }) {
-  return `[quote]英文日志：${url}
+  return `[quote]转载请注明本帖来源NGA[s:a2:poi]
+[/quote]
+[quote]英文日志：${url}
 [/quote]
 ${translateNgaNode(tree)}`;
 }
 
-getPage('http://us.battle.net/heroes/en/blog/21179026/heroes-of-the-storm-ptr-notes-november-6-2017-11-6-2017')
+getPage('http://us.battle.net/heroes/en/blog/21273597')
 .then(getArticleTree)
 .then(serializeToNga)
 .then(console.log);
