@@ -91,7 +91,7 @@ Promise.join(
         if (['<lang rule', 'Heroes of the Storm'].includes(trimmedFromBody)) {
           return;
         }
-        const postFromBody = JSON.stringify(trimmedFromBody.toLowerCase().replace('’', "'");
+        const postFromBody = JSON.stringify(trimmedFromBody.toLowerCase().replace('’', "'"));
         const postToBody = _.trim(toBody);
         const dictValue = dict[postFromBody] || [];
         const duplicateItem = dictValue.find(([body]) => body === postToBody);

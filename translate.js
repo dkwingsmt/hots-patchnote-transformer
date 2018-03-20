@@ -332,6 +332,7 @@ function translatePreset(origin) {
     'collection': '收藏',
     'hotkeys': '快捷键',
     'new announcer': '新播报员',
+    'new announcers': '新播报员',
     'map rotation update': '地图轮换更新',
     'ranked battleground rotation update': '排名战场轮换更新',
     'ranked battleground rotation': '排名战场轮换',
