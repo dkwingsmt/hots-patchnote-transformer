@@ -24,6 +24,18 @@ function splitBracket(origin) {
   return null;
 }
 
+function splitSquareBracket(origin) {
+  const bracketResult = /^(.*?)( *)\[([^ )])\]( *)(.*?)$/g.exec(origin);
+  if (bracketResult) {
+    const [o, body1, space1, body2, space2, body3] = bracketResult;
+    return [
+      [body1, body2, body3],
+      ([tBody1, tBody2, tBody3]) => `${tBody1}${space1}(${tBody2})${space2}${tBody3}`,
+    ];
+  }
+  return null;
+}
+
 function splitColon(origin) {
   const bracketResult = /^(.*?)( *: *)(.*)$/g.exec(origin);
   if (bracketResult) {
@@ -186,17 +198,17 @@ function translatePreset(origin) {
     [/^now (.*)$/i, (r) => `现在${translatePhrase(r[1])}`],
     [/^also (.*)$/i, (r) => `还会${translatePhrase(r[1])}`],
     [/^renamed to (.*)$/i, (r) => `重命名为${translatePhrase(r[1])}`],
-    [/^(.*) (reduce|lower|decrease|increase)s?(?:e?d)? from ([\d.]*) ?([^ ]*) to ([\d.]*)(.*)$/ig,
+    [/^(.*?) (reduce|lower|decrease|increase)s?(?:e?d)? from ([\d.]*?) ?([^ ]*?) to ([\d.]*?)(.*?)$/ig,
       (r) => `${statItems(r[1])}从${r[3]}${statUnits(r[4])}${buffAction(r[2])}到${r[5]}${statUnits(r[6])}`],
-    [/^(reduce|lower|decrease|increase)s?(?:e?d)? (.*) from ([\d.]*) ?([^ ]*) to ([\d.]*)(.*)$/ig,
+    [/^(reduce|lower|decrease|increase)s?(?:e?d)? (.*?) from ([\d.]*?) ?([^ ]*?) to ([\d.]*?)(.*?)$/ig,
       (r) => `${statItems(r[2])}从${r[3]}${statUnits(r[4])}${buffAction(r[1])}到${r[5]}${statUnits(r[6])}`],
-    [/^(lower|decrease|increase)s?(?:e?d)? (?:the )?(.*?)(?: of (.+))? by (an additional )?([\d.]+)(.*)$/ig,
+    [/^(lower|decrease|increase)s?(?:e?d)? (?:the )?(.*?)(?: of (.+))? by (an additional )?([\d.]+)(.*?)$/ig,
       (r) => `将${translatePhrase(r[3])}${ifExist(r[3], '的')}${statItems(r[2])}${ifExist(r[4], '额外')}${buffAction(r[1])}${r[5]}${statUnits(r[6])}`],
-    [/^(?:the )?(.*?)(?: of (.+))? (lower|decrease|increase)s?(?:e?d)? by (an additional )?([\d.]+)(.*)$/ig,
+    [/^(?:the )?(.*?)(?: of (.+))? (lower|decrease|increase)s?(?:e?d)? by (an additional )?([\d.]+)(.*?)$/ig,
       (r) => `${translatePhrase(r[2])}${ifExist(r[2], '的')}${statItems(r[1])}${ifExist(r[4], '额外')}${buffAction(r[3])}了${r[5]}${statUnits(r[6])}`],
     [/^(grants? ?)([+.0-9]+) ?(physical|spell)? armor$/gi,
       (r) => `${ifExist(r[1], '给予')}${r[2]}${ifExist(r[3], s => ({ physical: '物理', spell: '法术' })[s.toLowerCase()])}护甲`],
-    [/^(.*)'s prices will be reduced to ([\d,]+) Gold and \$([\d,.]+) USD.$/ig,
+    [/^(.*?)'s prices will be reduced to ([\d,]+) Gold and \$([\d,.]+) USD.$/ig,
       (r) => `${translatePhrase(r[1])}的价格降低为${r[2]}金币或${r[3]}美元.`],
     [/^(.+) ha(s|ve) received updated visual effects$/gi,
       (r) => `${translatePhrase(r[1])}的视觉效果得到了改进`],
@@ -319,6 +331,7 @@ function translatePreset(origin) {
     'loot chests': '战利品',
     'collection': '收藏',
     'hotkeys': '快捷键',
+    'new announcer': '新播报员',
     'map rotation update': '地图轮换更新',
     'ranked battleground rotation update': '排名战场轮换更新',
     'ranked battleground rotation': '排名战场轮换',
@@ -352,7 +365,7 @@ function translatePhrase(origin) {
     return '';
   }
   let validSplit;
-  _.forEach([splitBracket, splitColon, splitXXXTalents, splitDash], splitMethod => {
+  _.forEach([splitBracket, splitSquareBracket, splitColon, splitXXXTalents, splitDash], splitMethod => {
     const splitResult = splitMethod(origin);
     if (splitResult) {
       validSplit = splitResult;
