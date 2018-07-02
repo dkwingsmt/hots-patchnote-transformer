@@ -218,6 +218,8 @@ function translatePreset(origin) {
       (r) => `限时出售至${translatePhrase(r[1])}`],
     [/^(january|february|march|april|may|june|july|august|september|october|november|december) (\d+), (\d+)$/gi,
       (r) => moment(r[0], 'MMM D, YYYY').format('YYYY年M月D日')],
+    [/^neutral (.*)$/i, '中立的$1'],
+    [/^captured (.*)$/i, '驯服的$1'],
   ];
   let result = origin;
   const validre = regexps.find(([re]) => re.exec(origin));
@@ -342,6 +344,10 @@ function translatePreset(origin) {
     'the ranked map rotation has been updated to include the following': '排位赛地图轮换已更新',
     'heroes of the storm ptr notes': '《风暴英雄》公开测试服补丁说明',
     'heroes & talents': '英雄与天赋',
+    'target info panel': '目标信息面板',
+    'fixed a number of typo and tooltip errors across several aspects of the game': '修复了游戏中多处拼写错误和提示文字错误',
+    'orange text indicates a difference between the ptr and live patch notes.': '橙色文字表示公开测试服与正式服日志之间的区别',
+    'note': '注',
   };
   _.map(presets, (to, from) => {
     if (_.trim(origin.toLowerCase()) === from) {

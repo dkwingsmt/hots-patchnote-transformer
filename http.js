@@ -21,6 +21,9 @@ function getArticleTreeTraverse(tree) {
     if (classAttr && classAttr.value.includes('news_area')) {
       return tree;
     }
+    if (classAttr && classAttr.value.includes('article-container')) {
+      return tree;
+    }
     const idAttr = tree.attrs.find(v => v.name === 'id');
     if (idAttr && idAttr.value === 'mainNews') {
       return tree;
@@ -75,6 +78,19 @@ function getNumAttr(node, attr) {
     return null;
   }
   return attrObj.value;
+}
+
+function trimNewlines(str) {
+  const trimmedLeft = _.trimStart(str, '\n');
+  const left = str.length - trimmedLeft.length;
+  const trimmedRight = _.trimEnd(trimmedLeft, '\n');
+  const right = trimmedLeft.length - trimmedRight.length;
+  return [trimmedRight, left, right];
+}
+
+function ensureNewlines(nodeText, startNum, endNum) {
+  const [trimmed, left, right] = trimNewlines(nodeText);
+  return _.repeat('\n', Math.max(startNum, left)) + trimmed + _.repeat('\n', Math.max(endNum, right));
 }
 
 function translateNgaNode(node, context) {
@@ -152,7 +168,7 @@ function translateNgaNode(node, context) {
     return children;
 
   case 'p':
-    return children ? `\n${children}` : '';
+    return children ? ensureNewlines(children, 1) : '';
   case 'strong':
   case 'b':
     return children ? `[b]${children}[/b]` : '';
@@ -168,16 +184,16 @@ function translateNgaNode(node, context) {
   case 'sub':
     return `[sub]${children}[/sub]`;
   case 'blockquote':
-    return `\n[quote]\n${children}\n[/quote]`;
+    return `\n[quote]${ensureNewlines(children, 1, 1)}[/quote]`;
   case 'article':
     return children;
   case 'ul': {
     const prefix = context.$prev ? '' : '\n';
-    return `\n${prefix}[list]${children}\n[/list]\n`;
+    return `\n${prefix}[list]${ensureNewlines(children, 0, 1)}[/list]\n`;
   }
   case 'ol': {
     const prefix = context.$prev ? '' : '\n';
-    return `\n${prefix}[list=1]${children}\n[/list]\n`;
+    return `\n${prefix}[list=1]${ensureNewlines(children, 0, 1)}[/list]\n`;
   }
   case 'li': {
     const prefix = context.$prev ? '\n' : '';
@@ -198,14 +214,6 @@ function translateNgaNode(node, context) {
   }
 }
 
-function trimNewlines(str) {
-  const trimmedLeft = _.trimStart(str, '\n');
-  const left = str.length - trimmedLeft.length;
-  const trimmedRight = _.trimEnd(trimmedLeft, '\n');
-  const right = trimmedLeft.length - trimmedRight.length;
-  return [trimmedRight, left, right];
-}
-
 function translateNgaNodeList(nodes) {
   let result = '';
   let prevNode = null;
@@ -223,8 +231,8 @@ function translateNgaNodeList(nodes) {
       result += ' ';
     }
   });
-  return _.trim(result)
-  .replace(/:$/g, ': ');
+  return (result + _.repeat('\n', prevNewlines))
+  .replace(/ *\n/g, '\n');
 }
 
 function serializeToNga({ tree, url }) {
@@ -235,7 +243,7 @@ function serializeToNga({ tree, url }) {
 ${translateNgaNode(tree)}`;
 }
 
-getPage('http://us.battle.net/heroes/en/blog/21594629')
+getPage('https://heroesofthestorm.com/en-us/blog/21907096/heroes-of-the-storm-ptr-notes-july-2-2018-2018-7-2/')
 .then(getArticleTree)
 .then(serializeToNga)
 .then(console.log);
