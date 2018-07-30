@@ -49,13 +49,16 @@ function splitColon(origin) {
 }
 
 function splitDash(origin) {
-  const bracketResult = /^(.*?)( +[—–-] +)(.*)$/g.exec(origin);
+  const dashResult = /^(.*?)( *)[—–-]( *)(.*)$/g.exec(origin);
 
-  if (bracketResult) {
-    const [o, body1, mid, body2] = bracketResult;
+  if (dashResult) {
+    const [o, body1, space1, space2, body2] = dashResult;
+    if (!space1 && !space2) {
+      return null;
+    }
     return [
       [body1, body2],
-      ([tBody1, tBody2]) => `${tBody1}${mid}${tBody2}`,
+      ([tBody1, tBody2]) => `${tBody1}${space1 && ' '}-${space2 && ' '}${tBody2}`,
     ];
   }
   return null;
@@ -218,6 +221,10 @@ function translatePreset(origin) {
       (r) => `限时出售至${translatePhrase(r[1])}`],
     [/^(january|february|march|april|may|june|july|august|september|october|november|december) (\d+), (\d+)$/gi,
       (r) => moment(r[0], 'MMM D, YYYY').format('YYYY年M月D日')],
+    [/^neutral (.*)$/i, '中立的$1'],
+    [/^captured (.*)$/i, '驯服的$1'],
+    [/^available starting the week of ([^ ]+ [0-9]+) until ([^ ]+ [0-9]+).?$/i, 
+      (r) => `将从${moment(r[1], 'MMM D').format('M月D日')}当周开始上线，${moment(r[2], 'MMM D').format('M月D日')}截止。`],
   ];
   let result = origin;
   const validre = regexps.find(([re]) => re.exec(origin));
@@ -274,7 +281,7 @@ function translatePreset(origin) {
     'reward': '奖励',
     '!reward': '奖励',
     'rewards': '奖励',
-    'indicates a questing talent.': '代表该天赋为任务天赋.',
+    'indicates a quest talent.': '代表该天赋为任务天赋.',
     'italic text': '斜体字',
     'bold text': '粗体字',
     'underlined': '下划线',
@@ -342,6 +349,12 @@ function translatePreset(origin) {
     'the ranked map rotation has been updated to include the following': '排位赛地图轮换已更新',
     'heroes of the storm ptr notes': '《风暴英雄》公开测试服补丁说明',
     'heroes & talents': '英雄与天赋',
+    'target info panel': '目标信息面板',
+    'new bundles and skin packs': '新的礼包和皮肤包',
+    'the following new bundles will soon become available for a limited time': '以下新的礼包很快将限时上线',
+    'fixed a number of typo and tooltip errors across several aspects of the game': '修复了游戏中多处拼写错误和提示文字错误',
+    'orange text indicates a difference between the ptr and live patch notes.': '橙色文字表示公开测试服与正式服日志之间的区别',
+    'note': '注',
   };
   _.map(presets, (to, from) => {
     if (_.trim(origin.toLowerCase()) === from) {
