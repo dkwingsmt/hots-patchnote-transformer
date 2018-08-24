@@ -1,57 +1,10 @@
-﻿import parse5 from 'parse5';
 import _ from 'lodash';
-import rp from 'request-promise';
-import { translate } from './translate';
+import { AST } from 'parse5';
 
+import { translate } from './translate';
 import { findNearestColor } from './color';
 
-function getPage(url) {
-  return rp(url).then(htmlText => ({ htmlText, url }));
-}
-
-function getArticleTreeTraverse(tree) {
-  if (tree.nodeName === 'article') {
-    return tree;
-  }
-  if (tree.attrs) {
-    const classAttr = tree.attrs.find(v => v.name === 'class');
-    if (classAttr && classAttr.value.includes('notes-detail')) {
-      return tree;
-    }
-    if (classAttr && classAttr.value.includes('news_area')) {
-      return tree;
-    }
-    if (classAttr && classAttr.value.includes('article-container')) {
-      return tree;
-    }
-    const idAttr = tree.attrs.find(v => v.name === 'id');
-    if (idAttr && idAttr.value === 'mainNews') {
-      return tree;
-    }
-  }
-  let result;
-  _.forEach(tree.childNodes, (node) => {
-    if (node) {
-      const found = getArticleTreeTraverse(node);
-      if (found) {
-        result = found;
-        return false;
-      }
-    }
-  });
-  return result;
-}
-
-function getArticleTree({ url, htmlText }) {
-  const htmlTree = parse5.parse(htmlText);
-  const articleTree = getArticleTreeTraverse(htmlTree);
-  if (!articleTree) {
-    throw new Error('Can\'t find the article.');
-  }
-  return { tree: articleTree, url };
-}
-
-function parseStyle(node) {
+function parseStyle(node): Record<string, string> {
   if (!node.attrs) {
     return {};
   }
@@ -80,7 +33,7 @@ function getNumAttr(node, attr) {
   return attrObj.value;
 }
 
-function trimNewlines(str) {
+function trimNewlines(str): [string, number, number] {
   const trimmedLeft = _.trimStart(str, '\n');
   const left = str.length - trimmedLeft.length;
   const trimmedRight = _.trimEnd(trimmedLeft, '\n');
@@ -88,12 +41,12 @@ function trimNewlines(str) {
   return [trimmedRight, left, right];
 }
 
-function ensureNewlines(nodeText, startNum, endNum) {
+function ensureNewlines(nodeText, startNum, endNum: number=0) {
   const [trimmed, left, right] = trimNewlines(nodeText);
   return _.repeat('\n', Math.max(startNum, left)) + trimmed + _.repeat('\n', Math.max(endNum, right));
 }
 
-function translateNgaNode(node, context) {
+export function translateNgaNode(node, context: Record<string, any>={}) {
   if (node.nodeName === '#text') {
     const replaced = node.value
     .replace('’', '\'')
@@ -111,7 +64,7 @@ function translateNgaNode(node, context) {
     node.childNodes = node.childNodes.slice(0, 1);
   }
   // Node types to skip
-  if (['style', 'script', '#comment', 'font'].includes(node.nodeName)) {
+  if (_.includes(['style', 'script', '#comment', 'font'], node.nodeName)) {
     return '';
   }
   const style = parseStyle(node);
@@ -216,7 +169,7 @@ function translateNgaNode(node, context) {
 
 function translateNgaNodeList(nodes) {
   let result = '';
-  let prevNode = null;
+  let prevNode: AST.Default.Node;
   let prevNewlines = 0;
   _.forEach(nodes, (node) => {
     const nodeText = translateNgaNode(node, { $prev: prevNode });
@@ -234,16 +187,3 @@ function translateNgaNodeList(nodes) {
   return (result + _.repeat('\n', prevNewlines))
   .replace(/ *\n/g, '\n');
 }
-
-function serializeToNga({ tree, url }) {
-  return `[quote]转载请注明本帖来源NGA[s:a2:poi]
-[/quote]
-[quote]英文日志：${url}
-[/quote]
-${translateNgaNode(tree)}`;
-}
-
-getPage('https://heroesofthestorm.com/en-us/blog/21907096/heroes-of-the-storm-ptr-notes-july-2-2018-2018-7-2/')
-.then(getArticleTree)
-.then(serializeToNga)
-.then(console.log);

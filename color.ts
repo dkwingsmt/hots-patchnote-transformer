@@ -2,14 +2,16 @@ import colorRgb from 'color-space/rgb';
 import colorXyz from 'color-space/xyz';
 import 'color-space/lab';
 import DeltaE from 'delta-e';
-import _ from 'lodash';
+import * as _ from 'lodash';
 
-function rgb2lab(rgb) {
+type ArrayColor = [number, number, number]
+
+function rgb2lab(rgb: ArrayColor): ArrayColor {
   return colorXyz.lab(colorRgb.xyz(rgb));
 }
 
 const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-function hex2rgb(hex) {
+function hex2rgb(hex: string): ArrayColor {
     // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
   hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
 
@@ -32,9 +34,10 @@ function hex2rgb(hex) {
   }
 
   console.error('Unparsable color', hex);
+  return [0, 0, 0];
 }
 
-function labDistance(lab1, lab2) {
+function labDistance(lab1: ArrayColor, lab2: ArrayColor): number {
   return DeltaE.getDeltaE94(
     { L: lab1[0], A: lab1[1], B: lab1[2] },
     { L: lab2[0], A: lab2[1], B: lab2[2] },
@@ -70,9 +73,9 @@ const ngaColors = _.mapValues({
 
 export function findNearestColor(hex) {
   const lab = rgb2lab(hex2rgb(hex));
-  const distances = _.map(ngaColors, (ngaLab, name) => [
+  const distances = _.map(ngaColors, (ngaLab, name): [number, string] => [
     labDistance(ngaLab, lab),
     name,
   ]);
-  return _.minBy(distances, 0)[1];
+  return (_.minBy(distances, 0) || ngaColors[0])[1];
 }
