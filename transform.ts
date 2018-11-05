@@ -3,23 +3,24 @@ import * as parse5 from 'parse5';
 
 import { findNearestColor } from './color';
 import { translate } from './translate';
-import { isElement, isNode, isParentNode, isTextNode } from './utils';
+import { isElement, isParentNode, isTextNode } from './utils';
 
 function parseStyle(node: parse5.DefaultTreeNode): Record<string, string> {
   if (!isElement(node)) {
     return {};
   }
-  const styleAttr = node.attrs.find(v => v.name === 'style');
+  const styleAttr = node.attrs.find((v: parse5.Attribute) => v.name === 'style');
   if (!styleAttr) {
     return {};
   }
   const styles = styleAttr.value
     .split(';')
-    .map(s => _.trim(s))
+    .map(_.trim)
     .filter(Boolean)
-    .map(s => s.split(':'))
-    .map(([a, b]) => [_.trim(a), _.trim(b)])
-    .filter(v => v.length === 2);
+    .map((s: string) => s.split(':'))
+    .map(([a, b]: string[]) => [_.trim(a), _.trim(b)])
+    .filter((v: string[]) => v.length === 2);
+
   return _.fromPairs(styles);
 }
 
@@ -28,17 +29,18 @@ function findAttr(node: parse5.DefaultTreeNode, field: string) {
     return undefined;
   }
 
-  return node.attrs.find((attr) => attr.name === field);
+  return node.attrs.find((attr: parse5.Attribute) => attr.name === field);
 }
 
 function getNumAttr(node: parse5.DefaultTreeNode, attr: string) {
   if (!isElement(node)) {
     return null;
   }
-  const attrObj = node.attrs.find(v => v.name === attr);
+  const attrObj = node.attrs.find((v: parse5.Attribute) => v.name === attr);
   if (!attrObj) {
     return null;
   }
+
   return attrObj.value;
 }
 
@@ -47,15 +49,18 @@ function trimNewlines(str: string): [string, number, number] {
   const left = str.length - trimmedLeft.length;
   const trimmedRight = _.trimEnd(trimmedLeft, '\n');
   const right = trimmedLeft.length - trimmedRight.length;
+
   return [trimmedRight, left, right];
 }
 
 function ensureNewlines(nodeText: string, startNum: number, endNum: number = 0) {
   const [trimmed, left, right] = trimNewlines(nodeText);
+
   return _.repeat('\n', Math.max(startNum, left)) + trimmed + _.repeat('\n', Math.max(endNum, right));
 }
 
-export function translateNgaNode(node: parse5.DefaultTreeNode, context: Record<string, any>= {}) {
+// tslint:disable-next-line:max-func-body-length cyclomatic-complexity
+export function translateNgaNode(node: parse5.DefaultTreeNode, context: Record<string, unknown> = {}) {
   if (isTextNode(node)) {
     const replaced = node.value
     .replace('’', '\'')
@@ -65,6 +70,7 @@ export function translateNgaNode(node: parse5.DefaultTreeNode, context: Record<s
     ;
     const result = _.trim(replaced);
     const translated = translate(result);
+
     return translated
       .replace('ú', 'u');
   }
@@ -108,6 +114,7 @@ export function translateNgaNode(node: parse5.DefaultTreeNode, context: Record<s
     const rowspan = getNumAttr(node, 'rowspan');
     const rowspanStr = rowspan ? ` rowspan=${rowspan}` : '';
     // const boldChildren = node.nodeName === 'th' ? `[b]${children}[/b]` : children;
+
     return `\n[td${rowspanStr}${colspanStr}]${children}[/td]`;
   }
   case 'h1':
@@ -122,6 +129,7 @@ export function translateNgaNode(node: parse5.DefaultTreeNode, context: Record<s
       h4: 120,
       h5: 110,
     };
+
     return children ? `\n[size=${sizes[node.nodeName]}%][b]${children}[/b][/size]\n` : '';
   }
 
@@ -153,14 +161,17 @@ export function translateNgaNode(node: parse5.DefaultTreeNode, context: Record<s
     return children;
   case 'ul': {
     const prefix = context.$prev ? '' : '\n';
+
     return `\n${prefix}[list]${ensureNewlines(children, 0, 1)}[/list]\n`;
   }
   case 'ol': {
     const prefix = context.$prev ? '' : '\n';
+
     return `\n${prefix}[list=1]${ensureNewlines(children, 0, 1)}[/list]\n`;
   }
   case 'li': {
     const prefix = context.$prev ? '\n' : '';
+
     return `${prefix}[*]${children}`;
   }
 
@@ -169,11 +180,13 @@ export function translateNgaNode(node: parse5.DefaultTreeNode, context: Record<s
     if (src) {
       return `\n[img]${src.value}[/img]\n`;
     }
+
     return '';
   }
 
   default:
     console.warn(`Unhandled node type ${node.nodeName}`);
+
     return children;
   }
 }
@@ -182,7 +195,7 @@ function translateNgaNodeList(nodes: parse5.DefaultTreeNode[]) {
   let result = '';
   let prevNode: parse5.DefaultTreeNode;
   let prevNewlines = 0;
-  _.forEach(nodes, (node) => {
+  _.forEach(nodes, (node: parse5.DefaultTreeNode) => {
     const nodeText = translateNgaNode(node, { $prev: prevNode });
     if (nodeText.length !== 0) {
       prevNode = node;
@@ -195,6 +208,7 @@ function translateNgaNodeList(nodes: parse5.DefaultTreeNode[]) {
       result += ' ';
     }
   });
+
   return (result + _.repeat('\n', prevNewlines))
     .replace(/ *\n/g, '\n');
 }

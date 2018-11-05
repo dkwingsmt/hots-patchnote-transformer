@@ -1,4 +1,4 @@
-import 'color-space/lab';
+import colorLab from 'color-space/lab'; // tslint:disable-line no-unused
 import colorRgb from 'color-space/rgb';
 import colorXyz from 'color-space/xyz';
 import DeltaE from 'delta-e';
@@ -11,9 +11,9 @@ function rgb2lab(rgb: ArrayColor): ArrayColor {
 }
 
 const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-function hex2rgb(hex: string): ArrayColor {
+function hex2rgb(origin: string): ArrayColor {
   // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
-  hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
+  const hex = origin.replace(shorthandRegex, (_m: string, r: string, g: string, b: string) => r + r + g + g + b + b);
 
   const resultHex = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   if (resultHex) {
@@ -34,6 +34,7 @@ function hex2rgb(hex: string): ArrayColor {
   }
 
   console.error('Unparsable color', hex);
+
   return [0, 0, 0];
 }
 
@@ -44,38 +45,42 @@ function labDistance(lab1: ArrayColor, lab2: ArrayColor): number {
   );
 }
 
-const ngaColors = _.mapValues({
-  skyblue: '#87ceeb',
-  royalblue: '#4169e1',
-  blue: '#0000ff',
-  darkblue: '#00008b',
-  orange: '#ffa500',
-  orangered: '#ff4500',
-  crimson: '#dc143c',
-  red: '#ff0000',
-  firebrick: '#b22222',
-  darkred: '#8b0000',
-  green: '#008000',
-  limegreen: '#32cd32',
-  seagreen: '#2e8b57',
-  teal: '#008080',
-  deeppink: '#ff1493',
-  tomato: '#ff6347',
-  coral: '#ff7f50',
-  purple: '#800080',
-  indigo: '#4b0082',
-  burlywood: '#deb887',
-  sandybrown: '#f4a460',
-  sienna: '#a0522d',
-  chocolate: '#d2691e',
-  silver: '#c0c0c0',
-},                            (hex) => rgb2lab(hex2rgb(hex)));
+const ngaColors = _.mapValues(
+  {
+    skyblue: '#87ceeb',
+    royalblue: '#4169e1',
+    blue: '#0000ff',
+    darkblue: '#00008b',
+    orange: '#ffa500',
+    orangered: '#ff4500',
+    crimson: '#dc143c',
+    red: '#ff0000',
+    firebrick: '#b22222',
+    darkred: '#8b0000',
+    green: '#008000',
+    limegreen: '#32cd32',
+    seagreen: '#2e8b57',
+    teal: '#008080',
+    deeppink: '#ff1493',
+    tomato: '#ff6347',
+    coral: '#ff7f50',
+    purple: '#800080',
+    indigo: '#4b0082',
+    burlywood: '#deb887',
+    sandybrown: '#f4a460',
+    sienna: '#a0522d',
+    chocolate: '#d2691e',
+    silver: '#c0c0c0',
+  },
+  (hex: string) => rgb2lab(hex2rgb(hex)),
+);
 
 export function findNearestColor(hex: string) {
   const lab = rgb2lab(hex2rgb(hex));
-  const distances = _.map(ngaColors, (ngaLab, name): [number, string] => [
+  const distances = _.map(ngaColors, (ngaLab: ArrayColor, name: string): [number, string] => [
     labDistance(ngaLab, lab),
     name,
   ]);
+
   return (_.minBy(distances, 0) || ngaColors[0])[1];
 }

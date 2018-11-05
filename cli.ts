@@ -7,7 +7,8 @@ import rp from 'request-promise';
 import { pageToNga } from './http';
 
 async function getPageFromUrl(url: string) {
-  const htmlText = await rp(url) as string;
+  const htmlText = <string>(await rp(url));
+
   return { htmlText, url };
 }
 
@@ -26,6 +27,7 @@ async function getPageFromFile(filePath: string) {
         (err: NodeJS.ErrnoException, content: string) => {
           if (err) {
             reject(err);
+
             return;
           }
           resolve(content);
@@ -33,10 +35,12 @@ async function getPageFromFile(filePath: string) {
       );
     },
   );
+
   return { htmlText: await task };
 }
 
 function sourceIsUrl(src: string) {
+  // tslint:disable-next-line:no-http-string
   return src.startsWith('http://') || src.startsWith('https://');
 }
 
@@ -48,6 +52,7 @@ function argSource() {
     console.error(`USAGE: node cli.js SOURCE`);
     exit(1);
   }
+
   return src;
 }
 
@@ -58,6 +63,7 @@ async function main() {
   let content: {htmlText: string; url?: string};
   try {
     content = await task;
+    // tslint:disable-next-line:no-console
     console.log(pageToNga(content));
   } catch (e) {
     console.error(e.stack);

@@ -9,6 +9,7 @@
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
+    "lib": ["dom", "es2017"],
     "moduleResolution": "node",
     "strictNullChecks": true,
     "typeRoots" : ["./node_modules/@types", "./@types"]

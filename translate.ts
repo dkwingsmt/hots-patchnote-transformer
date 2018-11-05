@@ -2,100 +2,126 @@ import _ from 'lodash';
 import moment from 'moment';
 import i18nDict from './i18n';
 
-function ifExist(flag, str) {
+function ifExist(flag: string, str: string | ((s: string) => string)): string {
   if (!flag) {
     return '';
   }
   if (typeof str === 'function') {
     return str(flag);
   }
+
   return str;
 }
 
-function splitBracket(origin) {
+function splitBracket(origin: string) {
   const bracketResult = /^(.*?)( *)\(([^)]*)\)( *)(.*?)$/g.exec(origin);
   if (bracketResult) {
-    const [o, body1, space1, body2, space2, body3] = bracketResult;
+    const [
+      _o, // tslint:disable-line:no-unused
+      body1, space1, body2, space2, body3,
+    ] = bracketResult;
+
     return [
       [body1, body2, body3],
-      ([tBody1, tBody2, tBody3]) => `${tBody1}${space1}(${tBody2})${space2}${tBody3}`,
+      ([tBody1, tBody2, tBody3]: [string, string, string]) => `${tBody1}${space1}(${tBody2})${space2}${tBody3}`,
     ];
   }
+
   return null;
 }
 
-function splitSquareBracket(origin) {
+function splitSquareBracket(origin: string) {
   const bracketResult = /^(.*?)( *)\[([^ )])\]( *)(.*?)$/g.exec(origin);
   if (bracketResult) {
-    const [o, body1, space1, body2, space2, body3] = bracketResult;
+    const [
+      _o, // tslint:disable-line:no-unused
+      body1, space1, body2, space2, body3,
+    ] = bracketResult;
+
     return [
       [body1, body2, body3],
-      ([tBody1, tBody2, tBody3]) => `${tBody1}${space1}(${tBody2})${space2}${tBody3}`,
+      ([tBody1, tBody2, tBody3]: [string, string, string]) => `${tBody1}${space1}(${tBody2})${space2}${tBody3}`,
     ];
   }
+
   return null;
 }
 
-function splitColon(origin) {
+function splitColon(origin: string) {
   const bracketResult = /^(.*?)( *: *)(.*)$/g.exec(origin);
   if (bracketResult) {
-    const [o, body1, mid, body2] = bracketResult;
+    const [
+      _o, // tslint:disable-line:no-unused
+      body1, mid, body2,
+    ] = bracketResult;
+
     return [
       [body1, body2],
-      ([tBody1, tBody2]) => `${tBody1}${mid}${tBody2}`,
+      ([tBody1, tBody2]: [string, string]) => `${tBody1}${mid}${tBody2}`,
     ];
   }
+
   return null;
 }
 
-function splitDash(origin) {
+function splitDash(origin: string) {
   const dashResult = /^(.*?)( *)[—–-]( *)(.*)$/g.exec(origin);
 
   if (dashResult) {
-    const [o, body1, space1, space2, body2] = dashResult;
+    const [
+      _o, // tslint:disable-line:no-unused
+      body1, space1, space2, body2,
+    ] = dashResult;
     if (!space1 && !space2) {
       return null;
     }
+
     return [
       [body1, body2],
-      ([tBody1, tBody2]) => `${tBody1}${space1 && ' '}-${space2 && ' '}${tBody2}`,
+      ([tBody1, tBody2]: [string, string]) => `${tBody1}${space1 && ' '}-${space2 && ' '}${tBody2}`,
     ];
   }
+
   return null;
 }
 
-function splitXXXTalents(origin) {
+function splitXXXTalents(origin: string) {
   const bracketResult = /^(.*?) TALENTS$/g.exec(origin);
   if (bracketResult) {
-    const [o, name] = bracketResult;
+    const [
+      _o, // tslint:disable-line:no-unused
+      name,
+    ] = bracketResult;
+
     return [
       [name],
-      ([tName]) => `${tName}天赋`,
+      ([tName]: [string]) => `${tName}天赋`,
     ];
   }
+
   return null;
 }
 
-function statItems(o) {
+function statItems(o: string) {
   const dict = {
-    'cooldown': '冷却时间',
-    'radius': '半径',
-    'health': '生命值',
+    cooldown: '冷却时间',
+    radius: '半径',
+    health: '生命值',
     'base maximum health': '基础最大生命值',
     'maximum base health': '基础最大生命值',
     'base health': '基础生命值',
     'base health regeneration': '基础生命回复',
     'health bonus': '生命值加成',
-    'healing': '治疗量',
-    'heal': '治疗量',
+    healing: '治疗量',
+    heal: '治疗量',
     'heal amount': '治疗量',
     'bonus healing': '额外治疗量',
-    'damage': '伤害',
+    damage: '伤害',
     'health gain': '生命加成',
     'armor granted': '护甲加成',
     'slow amount': '减速效果',
-    'slow': '减速效果',
-    'armor': '护甲',
+    slow: '减速效果',
+    armor: '护甲',
     'spell armor': '法术护甲',
     'physical armor': '物理护甲',
     'shield amount': '护盾量',
@@ -108,7 +134,7 @@ function statItems(o) {
     'explosion radius': '爆炸范围',
     'movement speed': '移动速度',
     'cast range': '施放距离',
-    'charges': '可储存次数',
+    charges: '可储存次数',
     'cooldown reduction': '冷却时间减少量',
     'duration bonus per attack': '每次攻击增加的持续时间',
     'ghoul attack damage': '食尸鬼攻击速度',
@@ -116,7 +142,7 @@ function statItems(o) {
     'search arc': '搜寻弧度',
     'vision range': '视野范围',
     'stun duration': '昏迷持续时间',
-    'duration': '持续时间',
+    duration: '持续时间',
     'damage over time': '持续伤害',
     'impact damage': '直接伤害',
     'armor bonus': '护甲加成',
@@ -138,12 +164,12 @@ function statItems(o) {
     'damage bonus': '伤害加成',
     'vision bonus': '视野加成',
     'slow duration': '减速效果持续时间',
-    'miscellaneous': '综合',
+    miscellaneous: '综合',
     'damage reduction': '伤害减少量',
     'heal reduction': '治疗降低效果',
     'armor duration': '护甲持续时间',
     'bonus range': '范围加成',
-    'range': '范围',
+    range: '范围',
     'life leech': '生命吸取比例',
     'bonus life leech': '生命吸取比例加成',
     'splash damage': '溅射伤害',
@@ -159,145 +185,162 @@ function statItems(o) {
     'movement speed slow': '移动速度减速效果',
     'life steal amount': '生命吸取量',
   };
+
   return _.get(dict, _.trim(o.toLowerCase()).replace('the ', ''), _.trim(o));
 }
 
-function statUnits(o) {
+function statUnits(o: string) {
   const dict = {
-    'second': '秒',
-    'seconds': '秒',
-    'games': '场游戏',
-    'stacks': '层',
+    second: '秒',
+    seconds: '秒',
+    games: '场游戏',
+    stacks: '层',
     'seconds.': '秒',
     'per second': '每秒',
     'per stack': '每层',
-    'range': '',
+    range: '',
     '% max health': '最大生命值',
     '% maximum health': '最大生命值',
     '% of maximum health': '最大生命值',
   };
+
   return _.get(dict, _.trim(o.toLowerCase()), _.trim(o));
 }
 
-function buffAction(o) {
+function buffAction(o: string) {
   const dict = [
     [['increase'], '增加'],
     [['decrease', 'reduce', 'lower'], '降低'],
   ];
-  const found = dict.find(([froms]) => froms.includes(o.toLowerCase()));
+  const found = dict.find(([froms]: [string[], string]) => froms.includes(o.toLowerCase()));
   if (found) {
     return found[1];
   }
+
   return o;
 }
 
-function translatePreset(origin) {
-  const regexps = [
+// tslint:disable-next-line:max-func-body-length
+function translatePreset(origin: string): string {
+  type Preset = [
+    RegExp,
+    string | ((r: RegExpMatchArray) => string)
+  ];
+  const regexps: Preset[] = [
     [/^Level (\d*)$/i, '$1级'],
     [/^Moved from level (\d*) to level (\d*).?$/i, '从$1级移到$2级'],
     [/^Moved from level (\d*).?$/i, '移自$1级'],
     [/^Moved to level (\d*).?$/i, '移至$1级'],
-    [/^heroes of the storm (ptr )?patch notes$/gi, (r) => `《风暴英雄》${ifExist(r[1], '公开测试服')}更新说明`],
-    [/^now (.*)$/i, (r) => `现在${translatePhrase(r[1])}`],
-    [/^also (.*)$/i, (r) => `还会${translatePhrase(r[1])}`],
-    [/^renamed to (.*)$/i, (r) => `重命名为${translatePhrase(r[1])}`],
+    [/^heroes of the storm (ptr )?patch notes$/gi, (r: RegExpMatchArray) => `《风暴英雄》${ifExist(r[1], '公开测试服')}更新说明`],
+    [/^now (.*)$/i, (r: RegExpMatchArray) => `现在${translatePhrase(r[1])}`],
+    [/^also (.*)$/i, (r: RegExpMatchArray) => `还会${translatePhrase(r[1])}`],
+    [/^renamed to (.*)$/i, (r: RegExpMatchArray) => `重命名为${translatePhrase(r[1])}`],
     [/^(.*?) (reduce|lower|decrease|increase)s?(?:e?d)? from ([\d.]*?) ?([^ ]*?) to ([\d.]*?)(.*?)$/ig,
-      (r) => `${statItems(r[1])}从${r[3]}${statUnits(r[4])}${buffAction(r[2])}到${r[5]}${statUnits(r[6])}`],
+      (r: RegExpMatchArray) => `${statItems(r[1])}从${r[3]}${statUnits(r[4])}${buffAction(r[2])}到${r[5]}${statUnits(r[6])}`],
     [/^(reduce|lower|decrease|increase)s?(?:e?d)? (.*?) from ([\d.]*?) ?([^ ]*?) to ([\d.]*?)(.*?)$/ig,
-      (r) => `${statItems(r[2])}从${r[3]}${statUnits(r[4])}${buffAction(r[1])}到${r[5]}${statUnits(r[6])}`],
+      (r: RegExpMatchArray) => `${statItems(r[2])}从${r[3]}${statUnits(r[4])}${buffAction(r[1])}到${r[5]}${statUnits(r[6])}`],
     [/^(lower|decrease|increase)s?(?:e?d)? (?:the )?(.*?)(?: of (.+))? by (an additional )?([\d.]+)(.*?)$/ig,
-      (r) => `将${translatePhrase(r[3])}${ifExist(r[3], '的')}${statItems(r[2])}${ifExist(r[4], '额外')}${buffAction(r[1])}${r[5]}${statUnits(r[6])}`],
+      (r: RegExpMatchArray) =>
+        `将${translatePhrase(r[3])}${ifExist(r[3], '的')}` +
+        `${statItems(r[2])}${ifExist(r[4], '额外')}${buffAction(r[1])}${r[5]}${statUnits(r[6])}`],
     [/^(?:the )?(.*?)(?: of (.+))? (lower|decrease|increase)s?(?:e?d)? by (an additional )?([\d.]+)(.*?)$/ig,
-      (r) => `${translatePhrase(r[2])}${ifExist(r[2], '的')}${statItems(r[1])}${ifExist(r[4], '额外')}${buffAction(r[3])}了${r[5]}${statUnits(r[6])}`],
+      (r: RegExpMatchArray) =>
+        `${translatePhrase(r[2])}${ifExist(r[2], '的')}` +
+        `${statItems(r[1])}${ifExist(r[4], '额外')}${buffAction(r[3])}了${r[5]}${statUnits(r[6])}`],
     [/^(grants? ?)([+.0-9]+) ?(physical|spell)? armor$/gi,
-      (r) => `${ifExist(r[1], '给予')}${r[2]}${ifExist(r[3], s => ({ physical: '物理', spell: '法术' })[s.toLowerCase()])}护甲`],
+      (r: RegExpMatchArray) =>
+        `${ifExist(r[1], '给予')}${r[2]}` +
+        `${ifExist(r[3], (s: string) => <string>_.get({ physical: '物理', spell: '法术' }, s.toLowerCase(), ''))}护甲`],
     [/^(.*?)'s prices will be reduced to ([\d,]+) Gold and \$([\d,.]+) USD.$/ig,
-      (r) => `${translatePhrase(r[1])}的价格降低为${r[2]}金币或${r[3]}美元.`],
+      (r: RegExpMatchArray) => `${translatePhrase(r[1])}的价格降低为${r[2]}金币或${r[3]}美元.`],
     [/^(.+) ha(s|ve) received updated visual effects$/gi,
-      (r) => `${translatePhrase(r[1])}的视觉效果得到了改进`],
+      (r: RegExpMatchArray) => `${translatePhrase(r[1])}的视觉效果得到了改进`],
     [/^(.+) ha(s|ve) received updated visual effects to coincide with ([a-z]+ )talent changes$/gi,
-      (r) => `${translatePhrase(r[1])}的视觉效果得到了更新，以符合天赋的更新`],
+      (r: RegExpMatchArray) => `${translatePhrase(r[1])}的视觉效果得到了更新，以符合天赋的更新`],
     [/^Available until (.+)$/gi,
-      (r) => `限时出售至${translatePhrase(r[1])}`],
+      (r: RegExpMatchArray) => `限时出售至${translatePhrase(r[1])}`],
     [/^(january|february|march|april|may|june|july|august|september|october|november|december) (\d+), (\d+)$/gi,
-      (r) => moment(r[0], 'MMM D, YYYY').format('YYYY年M月D日')],
+      (r: RegExpMatchArray) => moment(r[0], 'MMM D, YYYY').format('YYYY年M月D日')],
     [/^neutral (.*)$/i, '中立的$1'],
     [/^captured (.*)$/i, '驯服的$1'],
-    [/^available starting the week of ([^ ]+ [0-9]+) until ([^ ]+ [0-9]+).?$/i, 
-      (r) => `将从${moment(r[1], 'MMM D').format('M月D日')}当周开始上线，${moment(r[2], 'MMM D').format('M月D日')}截止。`],
+    [/^available starting the week of ([^ ]+ [0-9]+) until ([^ ]+ [0-9]+).?$/i,
+      (r: RegExpMatchArray) => `将从${moment(r[1], 'MMM D').format('M月D日')}当周开始上线，${moment(r[2], 'MMM D').format('M月D日')}截止。`],
   ];
-  let result = origin;
-  const validre = regexps.find(([re]) => re.exec(origin));
+  const validre = regexps.find(([re]: Preset) => !!re.exec(origin));
   if (validre) {
     if (typeof validre[1] === 'string') {
       return origin.replace(validre[0], validre[1]);
     }
-    validre[0].exec(origin);
-    return validre[1](validre[0].exec(origin));
+    const matched = validre[0].exec(origin);
+    if (!matched) {
+      return origin;
+    }
+
+    return validre[1](matched);
   }
 
-  const presets = {
-    'passive': '被动',
-    'active': '主动',
-    'removed': '已移除',
+  const presets: Record<string, string> = {
+    passive: '被动',
+    active: '主动',
+    removed: '已移除',
     'new talent': '新天赋',
-    'talent': '天赋',
-    'trait': '特质',
+    talent: '天赋',
+    trait: '特质',
     'new trait': '新特质',
-    'abilities': '技能',
-    'stats': '数据',
-    'talents': '天赋',
+    abilities: '技能',
+    stats: '数据',
+    talents: '天赋',
     'developer comment': '开发者评论',
     'developer comments': '开发者评论',
     'ptr note': '测试服注释',
-    'general': '综合',
-    'art': '美术',
-    'shop': '商店',
+    general: '综合',
+    art: '美术',
+    shop: '商店',
     'user interface': '界面',
-    'design': '设计',
+    design: '设计',
     'bug fixes': '错误修正',
     'new hero': '新英雄',
-    'mounts': '坐骑',
-    'mount': '坐骑',
+    mounts: '坐骑',
+    mount: '坐骑',
     'new mounts': '新坐骑',
     'returning mounts': '重新上架的坐骑',
     'removed mounts': '下架的坐骑',
-    'bundles': '新礼包',
+    bundles: '新礼包',
     'new bundles': '新礼包',
     'returning bundles': '重新上架的礼包',
     'removed bundles': '下架的礼包',
-    'skins': '新皮肤',
+    skins: '新皮肤',
     'new skins': '新皮肤',
     'returning skins': '重新上架的皮肤',
     'removed skins': '下架的皮肤',
-    'assassin': '刺杀型',
+    assassin: '刺杀型',
     'multi-class': '混合型',
-    'specialist': '专业型',
-    'support': '辅助型',
-    'warrior': '战斗型',
-    'warriors': '战斗型',
-    'quest': '任务',
+    specialist: '专业型',
+    support: '辅助型',
+    warrior: '战斗型',
+    warriors: '战斗型',
+    quest: '任务',
     '!quest': '任务',
-    'reward': '奖励',
+    reward: '奖励',
     '!reward': '奖励',
-    'rewards': '奖励',
+    rewards: '奖励',
     'indicates a quest talent.': '代表该天赋为任务天赋.',
     'italic text': '斜体字',
     'bold text': '粗体字',
-    'underlined': '下划线',
+    underlined: '下划线',
     'indicates a': '代表',
     'text indicates a': '字代表',
-    'new': '新',
-    'moved': '移动的',
+    new: '新',
+    moved: '移动的',
     'talent.': '天赋',
-    'level': '等级',
-    'tier': '天赋层级',
+    level: '等级',
+    tier: '天赋层级',
     'design & gameplay': '设计与游戏性',
-    'battlegrounds': '战场',
+    battlegrounds: '战场',
     'in-game user interface': '游戏界面',
     'draft mode': '征召模式',
-    'sounds': '声音',
-    'sound': '声音',
+    sounds: '声音',
+    sound: '声音',
     'heroes, abilities, and talents': '英雄、技能和天赋',
     'basic abilities': '基本技能',
     'heroic abilities': '终极技能',
@@ -316,28 +359,28 @@ function translatePreset(origin) {
     'added functionality': '新增效果',
     'additional functionality': '新增效果',
     'adjusted functionality': '调整效果',
-    'redesigned': '重新设计',
+    redesigned: '重新设计',
     'new ability': '新技能',
     'new active': '新主动激活效果',
     'heroes of the storm': '风暴英雄',
     'world of warcraft': '魔兽世界',
     'price reduction': '价格变动',
     'heroes brawl': '风暴乱斗',
-    'emojis': '表情',
-    'minions': '小兵',
+    emojis: '表情',
+    minions: '小兵',
     'try mode': '试用模式',
-    'mercenaries': '雇佣兵',
-    'defender': '防御者',
-    'laner': '推进者',
-    'forts': '堡垒',
-    'keeps': '要塞',
+    mercenaries: '雇佣兵',
+    defender: '防御者',
+    laner: '推进者',
+    forts: '堡垒',
+    keeps: '要塞',
     'dot effects': '持续伤害效果',
     'basic attacks': '普通攻击',
     'quick cast': '快速施法',
-    'emoji': '表情',
+    emoji: '表情',
     'loot chests': '战利品',
-    'collection': '收藏',
-    'hotkeys': '快捷键',
+    collection: '收藏',
+    hotkeys: '快捷键',
     'new announcer': '新播报员',
     'new announcers': '新播报员',
     'map rotation update': '地图轮换更新',
@@ -354,45 +397,57 @@ function translatePreset(origin) {
     'the following new bundles will soon become available for a limited time': '以下新的礼包很快将限时上线',
     'fixed a number of typo and tooltip errors across several aspects of the game': '修复了游戏中多处拼写错误和提示文字错误',
     'orange text indicates a difference between the ptr and live patch notes.': '橙色文字表示公开测试服与正式服日志之间的区别',
-    'note': '注',
+    note: '注',
   };
-  _.map(presets, (to, from) => {
-    if (_.trim(origin.toLowerCase()) === from) {
-      result = presets[from];
+
+  let result = origin;
+  _.map(presets, (_toS: string, fromS: string) => {
+    if (_.trim(origin.toLowerCase()) === fromS) {
+      result = presets[fromS];
+
       return false;
     }
+
     return null;
   });
+
   return result;
 }
 
-function translateToken(origin) {
+function translateToken(origin: string) {
   const queryResult = i18nDict[origin.toLowerCase()];
   if (queryResult) {
     return queryResult[0][0];
   }
+
   return translatePreset(origin);
 }
 
-function translatePhrase(origin) {
+function translatePhrase(origin: string): string {
   if (!origin) {
     return '';
   }
-  let validSplit;
-  _.forEach([splitBracket, splitSquareBracket, splitColon, splitXXXTalents, splitDash], splitMethod => {
-    const splitResult = splitMethod(origin);
-    if (splitResult) {
-      validSplit = splitResult;
-      return false;
-    }
-  });
+  let validSplit: [string[], (v: string[]) => string] | undefined;
+  _.forEach(
+    [splitBracket, splitSquareBracket, splitColon, splitXXXTalents, splitDash],
+    (splitMethod: (s: string) => [string[], (v: string[]) => string]) => {
+      const splitResult = splitMethod(origin);
+      if (splitResult) {
+        validSplit = splitResult;
+
+        return false;
+      }
+    },
+  );
   if (validSplit) {
     const [originTokens, recoverFunc] = validSplit;
+
     return recoverFunc(originTokens.map(translatePhrase));
   }
+
   return translateToken(origin);
 }
 
-export function translate(origin) {
+export function translate(origin: string) {
   return translatePhrase(origin);
 }

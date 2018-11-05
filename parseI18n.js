@@ -1,13 +1,13 @@
 import path from 'path';
 import _ from 'lodash';
-import { readFile, writeFile, readdirSync, statSync } from 'fs';
+import { readFile, writeFile, readdirSync } from 'fs';
 import Promise from 'bluebird';
 
 const BASE_DIR = path.join(__dirname, '../casc/mods');
 const GAME_STRINGS = 'LocalizedData/GameStrings.txt';
 
-const FROM_DIR = path.join(BASE_DIR, 'enus.stormdata');
-const TO_DIR = path.join(BASE_DIR, 'zhcn.stormdata');
+// const FROM_DIR = path.join(BASE_DIR, 'enus.stormdata');
+// const TO_DIR = path.join(BASE_DIR, 'zhcn.stormdata');
 
 function processText(buffer) {
   return buffer.toString().split('\n').map((line) => {
@@ -114,12 +114,18 @@ Promise.join(
   (dict) => _.filter(_.toPairs(dict), 0),
 ).then((dictPair) =>
   _.join(
-    ['export default {'].concat(
+    [
+      '// tslint:disable',
+      'const result: Record<string, string[][]> = {',
+    ].concat(
       _.sortBy(dictPair, 0)
       .map(([key, value]) =>
         `  ${key}: ${JSON.stringify(value)},`,
       ),
-    ).concat(['}']),
+    ).concat([
+      '}',
+      'export default result',
+    ]),
     '\n',
   ),
 ).then((result) =>

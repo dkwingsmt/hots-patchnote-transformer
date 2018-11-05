@@ -1,4 +1,5 @@
-export default {
+// tslint:disable
+const result: Record<string, string[][]> = {
   "- deals increased damaged to structures and minions.<n/>- takes reduced damage from structures.<n/>- unstoppable.": [["- 提高对建筑和小兵的伤害。<n/>- 受到建筑的伤害降低。<n/>- 不可阻挡。","Actor/InfoText/VehicleDragon"]],
   "... and a shark too!": [["…还有鲨鱼！","Button/Name/MurkyOctoGrabAndASharkTooTalent"]],
   "/flex": [["/强壮","Spray/Name/SprayAnimatedSummerTychusWatergun"]],
@@ -6179,5 +6180,6 @@ export default {
   "zombie wall": [["僵尸之墙","Button/Name/WitchDoctorZombieWall","Button/Name/WitchDoctorZombieWallCancel"]],
   "zul'jin pack 1": [["祖尔金包1","EmoticonPack/Name/ZuljinEmoticonPack"]],
   "zul'jin pack 2": [["祖尔金包2","EmoticonPack/Name/ZuljinEmoticonPack2"]],
-  "zul'jin": [["祖尔金","Hero/Name/Zuljin"]],
+  "zul'jin": [["祖尔金","Hero/Name/Zuljin"]]
 }
+export default result;
