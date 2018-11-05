@@ -2,12 +2,11 @@
   "extends": [
     "tslint:latest",
     "tslint-consistent-codestyle",
-    "tslint-react",
     "tslint-eslint-rules",
     "tslint-microsoft-contrib"
   ],
   "linterOptions": {
-    "exclude": ["**/*.js", "**/*.json"]
+    "exclude": ["**/*.js", "**/*.json", "i18n.js", "./build/", "./node_modules/"]
   },
   "rules": {
     "no-submodule-imports": false,
@@ -53,6 +52,7 @@
       "bluebird": "Promise",
       "reactJss": "injectSheet",
       "classnames": "classNames",
+      "requestPromise": "rp",
       "*Scss": "*Classes",
       "color": "Color"
     }],

@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "outDir": "./build/",
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "sourceMap": true,
     "module": "commonjs",
     "target": "es6",
@@ -10,9 +10,8 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "jsx": "react",
     "strictNullChecks": true,
-    "typeRoots" : ["node_modules/@types", "./src/@types"]
+    "typeRoots" : ["./node_modules/@types", "./@types"]
   },
   "exclude": [
     "node_modules",

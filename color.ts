@@ -1,10 +1,10 @@
+import 'color-space/lab';
 import colorRgb from 'color-space/rgb';
 import colorXyz from 'color-space/xyz';
-import 'color-space/lab';
 import DeltaE from 'delta-e';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
-type ArrayColor = [number, number, number]
+type ArrayColor = [number, number, number];
 
 function rgb2lab(rgb: ArrayColor): ArrayColor {
   return colorXyz.lab(colorRgb.xyz(rgb));
@@ -12,7 +12,7 @@ function rgb2lab(rgb: ArrayColor): ArrayColor {
 
 const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
 function hex2rgb(hex: string): ArrayColor {
-    // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+  // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
   hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
 
   const resultHex = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -69,9 +69,9 @@ const ngaColors = _.mapValues({
   sienna: '#a0522d',
   chocolate: '#d2691e',
   silver: '#c0c0c0',
-}, (hex) => rgb2lab(hex2rgb(hex)));
+},                            (hex) => rgb2lab(hex2rgb(hex)));
 
-export function findNearestColor(hex) {
+export function findNearestColor(hex: string) {
   const lab = rgb2lab(hex2rgb(hex));
   const distances = _.map(ngaColors, (ngaLab, name): [number, string] => [
     labDistance(ngaLab, lab),

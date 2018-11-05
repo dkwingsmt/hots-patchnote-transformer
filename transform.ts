@@ -1,11 +1,12 @@
 import _ from 'lodash';
-import { AST } from 'parse5';
+import * as parse5 from 'parse5';
 
-import { translate } from './translate';
 import { findNearestColor } from './color';
+import { translate } from './translate';
+import { isElement, isNode, isParentNode, isTextNode } from './utils';
 
-function parseStyle(node): Record<string, string> {
-  if (!node.attrs) {
+function parseStyle(node: parse5.DefaultTreeNode): Record<string, string> {
+  if (!isElement(node)) {
     return {};
   }
   const styleAttr = node.attrs.find(v => v.name === 'style');
@@ -22,8 +23,16 @@ function parseStyle(node): Record<string, string> {
   return _.fromPairs(styles);
 }
 
-function getNumAttr(node, attr) {
-  if (!node.attrs) {
+function findAttr(node: parse5.DefaultTreeNode, field: string) {
+  if (!isElement(node)) {
+    return undefined;
+  }
+
+  return node.attrs.find((attr) => attr.name === field);
+}
+
+function getNumAttr(node: parse5.DefaultTreeNode, attr: string) {
+  if (!isElement(node)) {
     return null;
   }
   const attrObj = node.attrs.find(v => v.name === attr);
@@ -33,7 +42,7 @@ function getNumAttr(node, attr) {
   return attrObj.value;
 }
 
-function trimNewlines(str): [string, number, number] {
+function trimNewlines(str: string): [string, number, number] {
   const trimmedLeft = _.trimStart(str, '\n');
   const left = str.length - trimmedLeft.length;
   const trimmedRight = _.trimEnd(trimmedLeft, '\n');
@@ -41,26 +50,26 @@ function trimNewlines(str): [string, number, number] {
   return [trimmedRight, left, right];
 }
 
-function ensureNewlines(nodeText, startNum, endNum: number=0) {
+function ensureNewlines(nodeText: string, startNum: number, endNum: number = 0) {
   const [trimmed, left, right] = trimNewlines(nodeText);
   return _.repeat('\n', Math.max(startNum, left)) + trimmed + _.repeat('\n', Math.max(endNum, right));
 }
 
-export function translateNgaNode(node, context: Record<string, any>={}) {
-  if (node.nodeName === '#text') {
+export function translateNgaNode(node: parse5.DefaultTreeNode, context: Record<string, any>= {}) {
+  if (isTextNode(node)) {
     const replaced = node.value
     .replace('’', '\'')
-    .replace('​', ' ')
+    .replace(' ', ' ')
     .replace(String.fromCharCode(10), ' ')
     .replace(String.fromCharCode(8203), ' ')
     ;
     const result = _.trim(replaced);
     const translated = translate(result);
     return translated
-    .replace('ú', 'u');
+      .replace('ú', 'u');
   }
   // <picture>: pick only the first child
-  if (node.nodeNames === 'picture') {
+  if (node.nodeName === 'picture' && isParentNode(node)) {
     node.childNodes = node.childNodes.slice(0, 1);
   }
   // Node types to skip
@@ -68,7 +77,9 @@ export function translateNgaNode(node, context: Record<string, any>={}) {
     return '';
   }
   const style = parseStyle(node);
-  const childrenRaw = translateNgaNodeList(node.childNodes);
+  const childrenRaw = isParentNode(node) ?
+    translateNgaNodeList(node.childNodes) :
+    '';
   let children = childrenRaw;
   if (style.color) {
     const ngaColor = findNearestColor(style.color);
@@ -154,7 +165,7 @@ export function translateNgaNode(node, context: Record<string, any>={}) {
   }
 
   case 'img': {
-    const src = node.attrs.find((attr) => attr.name === 'src');
+    const src = findAttr(node, 'src');
     if (src) {
       return `\n[img]${src.value}[/img]\n`;
     }
@@ -167,9 +178,9 @@ export function translateNgaNode(node, context: Record<string, any>={}) {
   }
 }
 
-function translateNgaNodeList(nodes) {
+function translateNgaNodeList(nodes: parse5.DefaultTreeNode[]) {
   let result = '';
-  let prevNode: AST.Default.Node;
+  let prevNode: parse5.DefaultTreeNode;
   let prevNewlines = 0;
   _.forEach(nodes, (node) => {
     const nodeText = translateNgaNode(node, { $prev: prevNode });
@@ -180,10 +191,10 @@ function translateNgaNodeList(nodes) {
       result += _.repeat('\n', Math.max(prevNewlines, leftNewlines));
       result += trimmedNodeText;
       prevNewlines = rightNewlines;
-    } else if (prevNode && prevNode.nodeName !== '#text') {
+    } else if (prevNode && !isTextNode(prevNode)) {
       result += ' ';
     }
   });
   return (result + _.repeat('\n', prevNewlines))
-  .replace(/ *\n/g, '\n');
+    .replace(/ *\n/g, '\n');
 }

@@ -1,18 +1,17 @@
-﻿import { parse } from 'parse5';
 import _ from 'lodash';
-import rp from 'request-promise';
+import * as parse5 from 'parse5';
 
 import { translateNgaNode } from './transform';
+import { isElement, isParentNode } from './utils';
 
-function getPage(url: string) {
-  return rp(url).then(htmlText => ({ htmlText, url }));
-}
-
-function getArticleTreeTraverse(tree) {
+function getArticleTreeTraverse(tree: parse5.DefaultTreeNode) {
   if (tree.nodeName === 'article') {
     return tree;
   }
-  if (tree.attrs) {
+  if (tree.nodeName === 'blockquote') {
+    return tree;
+  }
+  if (isElement(tree)) {
     const classAttr = tree.attrs.find(v => v.name === 'class');
     if (classAttr && classAttr.value.includes('notes-detail')) {
       return tree;
@@ -28,6 +27,9 @@ function getArticleTreeTraverse(tree) {
       return tree;
     }
   }
+  if (!isParentNode(tree)) {
+    return undefined;
+  }
   let result;
   _.forEach(tree.childNodes, (node) => {
     if (node) {
@@ -41,25 +43,21 @@ function getArticleTreeTraverse(tree) {
   return result;
 }
 
-function getArticleTree({ url, htmlText }) {
-  const htmlTree = parse(htmlText);
+function getArticleTree(htmlText: string) {
+  const htmlTree = <parse5.DefaultTreeDocument>parse5.parse(htmlText);
   const articleTree = getArticleTreeTraverse(htmlTree);
   if (!articleTree) {
     throw new Error('Can\'t find the article.');
   }
-  return { tree: articleTree, url };
+  return articleTree;
 }
 
-
-function serializeToNga({ tree, url }) {
+export function pageToNga({ htmlText, url }: { url?: string, htmlText: string }) {
+  const tree = getArticleTree(htmlText);
+  const sourceStr = url ? `[quote]英文日志：${url}
+[/quote]
+` : '';
   return `[quote]转载请注明本帖来源NGA[s:a2:poi]
 [/quote]
-[quote]英文日志：${url}
-[/quote]
-${translateNgaNode(tree)}`;
+${sourceStr}${translateNgaNode(tree)}`;
 }
-
-getPage('https://heroesofthestorm.com/en-us/blog/22358469')
-.then(getArticleTree)
-.then(serializeToNga)
-.then(console.log);
