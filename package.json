@@ -6,6 +6,8 @@
   "private": true,
   "main": "build/index.js",
   "scripts": {
+    "build": "tsc",
+    "transform": "node ./build/cli.js",
     "test": "echo No test"
   },
   "repository": {

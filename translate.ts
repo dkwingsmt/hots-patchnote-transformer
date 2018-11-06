@@ -1,6 +1,8 @@
 import _ from 'lodash';
 import moment from 'moment';
+
 import i18nDict from './i18n';
+import { toI18nKey } from './utils';
 
 function ifExist(flag: string, str: string | ((s: string) => string)): string {
   if (!flag) {
@@ -415,7 +417,7 @@ function translatePreset(origin: string): string {
 }
 
 function translateToken(origin: string) {
-  const queryResult = i18nDict[origin.toLowerCase()];
+  const queryResult = i18nDict[toI18nKey(origin)];
   if (queryResult) {
     return queryResult[0][0];
   }

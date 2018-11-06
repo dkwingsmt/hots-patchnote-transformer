@@ -3,6 +3,8 @@ import _ from 'lodash';
 import { readFile, writeFile, readdirSync } from 'fs';
 import Promise from 'bluebird';
 
+import { toI18nKey } from './utils.ts';
+
 const BASE_DIR = path.join(__dirname, '../casc/mods');
 const GAME_STRINGS = 'LocalizedData/GameStrings.txt';
 
@@ -93,7 +95,7 @@ Promise.join(
         if (['<lang rule', 'Heroes of the Storm'].includes(trimmedFromBody)) {
           return;
         }
-        const postFromBody = JSON.stringify(trimmedFromBody.toLowerCase().replace('’', "'"));
+        const postFromBody = JSON.stringify(toI18nKey(trimmedFromBody));
         const postToBody = _.trim(toBody);
         const dictValue = dict[postFromBody] || [];
         const duplicateItem = dictValue.find(([body]) => body === postToBody);
