@@ -270,15 +270,16 @@ function translatePreset(origin: string): string {
   ];
   const validre = regexps.find(([re]: Preset) => !!re.exec(origin));
   if (validre) {
-    if (typeof validre[1] === 'string') {
-      return origin.replace(validre[0], validre[1]);
+    const replaceTo = validre[1];
+    if (typeof replaceTo === 'string') {
+      return origin.replace(validre[0], replaceTo);
     }
     const matched = validre[0].exec(origin);
     if (!matched) {
       return origin;
     }
 
-    return validre[1](matched);
+    return replaceTo(matched);
   }
 
   const presets: Record<string, string> = {

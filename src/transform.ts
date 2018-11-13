@@ -60,7 +60,7 @@ function ensureNewlines(nodeText: string, startNum: number, endNum: number = 0) 
 }
 
 // tslint:disable-next-line:max-func-body-length cyclomatic-complexity
-export function translateNgaNode(node: parse5.DefaultTreeNode, context: Record<string, unknown> = {}) {
+export function transformNgaNode(node: parse5.DefaultTreeNode, context: Record<string, unknown> = {}) {
   if (isTextNode(node)) {
     const replaced = node.value
     .replace('’', '\'')
@@ -79,12 +79,12 @@ export function translateNgaNode(node: parse5.DefaultTreeNode, context: Record<s
     node.childNodes = node.childNodes.slice(0, 1);
   }
   // Node types to skip
-  if (_.includes(['style', 'script', '#comment', 'font'], node.nodeName)) {
+  if (_.includes(['style', 'script', '#comment'], node.nodeName)) {
     return '';
   }
   const style = parseStyle(node);
   const childrenRaw = isParentNode(node) ?
-    translateNgaNodeList(node.childNodes) :
+    transformNgaNodeList(node.childNodes) :
     '';
   let children = childrenRaw;
   if (style.color) {
@@ -191,12 +191,12 @@ export function translateNgaNode(node: parse5.DefaultTreeNode, context: Record<s
   }
 }
 
-function translateNgaNodeList(nodes: parse5.DefaultTreeNode[]) {
+export function transformNgaNodeList(nodes: parse5.DefaultTreeNode[]) {
   let result = '';
   let prevNode: parse5.DefaultTreeNode;
   let prevNewlines = 0;
   _.forEach(nodes, (node: parse5.DefaultTreeNode) => {
-    const nodeText = translateNgaNode(node, { $prev: prevNode });
+    const nodeText = transformNgaNode(node, { $prev: prevNode });
     if (nodeText.length !== 0) {
       prevNode = node;
       const [trimmedNodeText, leftNewlines, rightNewlines] = trimNewlines(nodeText);

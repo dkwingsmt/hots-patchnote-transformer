@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import * as parse5 from 'parse5';
 
-import { translateNgaNode } from './transform';
+import { transformNgaNode } from './transform';
 import { isElement, isParentNode } from './utils';
 
 function getArticleTreeTraverse(tree: parse5.DefaultTreeNode) {
@@ -63,5 +63,5 @@ export function pageToNga({ htmlText, url }: { url?: string; htmlText: string })
 
   return `[quote]转载请注明本帖来源NGA[s:a2:poi]
 [/quote]
-${sourceStr}${translateNgaNode(tree)}`;
+${sourceStr}${transformNgaNode(tree)}`;
 }
