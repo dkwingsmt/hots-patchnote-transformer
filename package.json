@@ -7,7 +7,7 @@
   "main": "build/index.js",
   "scripts": {
     "build": "tsc",
-    "transform": "node ./build/cli.js",
+    "transform": "node ./build/src/cli.js",
     "test": "echo No test"
   },
   "repository": {
@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "bluebird": "^3.4.6",
-    "color-space": "^1.14.7",
+    "color-space": "^1.16",
     "core-js": "^2.4.1",
     "delta-e": "0.0.7",
     "jest": "^23.6.0",

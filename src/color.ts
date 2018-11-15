@@ -1,13 +1,11 @@
-import colorLab from 'color-space/lab'; // tslint:disable-line no-unused
-import colorRgb from 'color-space/rgb';
-import colorXyz from 'color-space/xyz';
+import space from 'color-space';
 import DeltaE from 'delta-e';
 import _ from 'lodash';
 
 type ArrayColor = [number, number, number];
 
 function rgb2lab(rgb: ArrayColor): ArrayColor {
-  return colorXyz.lab(colorRgb.xyz(rgb));
+  return space.xyz.lab(space.rgb.xyz(rgb));
 }
 
 const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;

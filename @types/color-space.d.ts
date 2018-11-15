@@ -7,17 +7,10 @@ type Converter = {
   [k in Spaces]: ColorConvert;
 }
 
-declare module 'color-space/rgb' {
-  declare const rgb: Converter;
-  export = rgb;
-}
-
-declare module 'color-space/xyz' {
-  declare const xyz: Converter;
-  export = xyz;
-}
-
-declare module 'color-space/lab' {
-  declare const lab: Converter;
-  export = lab;
+declare module 'color-space' {
+  declare const space: {
+    xyz: Converter;
+    rgb: Converter;
+  };
+  export = space;
 }
