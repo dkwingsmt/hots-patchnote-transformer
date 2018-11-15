@@ -7,7 +7,15 @@ import rp from 'request-promise';
 import { pageToNga } from './http';
 
 async function getPageFromUrl(url: string) {
-  const htmlText = <string>(await rp(url));
+  const htmlText = <string>(await rp(
+    url,
+    {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) ' +
+          'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36',
+      },
+    },
+  ));
 
   return { htmlText, url };
 }
