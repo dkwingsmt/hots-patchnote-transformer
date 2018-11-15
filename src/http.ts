@@ -1,8 +1,9 @@
 import _ from 'lodash';
 import * as parse5 from 'parse5';
 
+import { Node } from './const';
 import { transformNgaNode } from './transform';
-import { isElement, isParentNode } from './utils';
+import { isElement, isParentNode, isTextNode } from './utils';
 
 function getArticleTreeTraverse(tree: parse5.DefaultTreeNode) {
   if (tree.nodeName === 'article') {
@@ -55,8 +56,24 @@ function getArticleTree(htmlText: string) {
   return articleTree;
 }
 
+function standardizeTree(node: parse5.DefaultTreeNode): Node {
+  if (isTextNode(node)) {
+    return {
+      kind: 'text',
+      text: node.value,
+    };
+  }
+
+  return {
+    kind: 'parent',
+    tag: node.nodeName,
+    children: isParentNode(node) ? node.childNodes.map(standardizeTree) : [],
+    attrs: isElement(node) ? node.attrs : [],
+  };
+}
+
 export function pageToNga({ htmlText, url }: { url?: string; htmlText: string }) {
-  const tree = getArticleTree(htmlText);
+  const tree = standardizeTree(getArticleTree(htmlText));
   const sourceStr = url ? `[quote]英文日志：${url}
 [/quote]
 ` : '';
