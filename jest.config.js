@@ -22,10 +22,5 @@ module.exports = {
     '/node_modules/',
     '/build/',
   ],
-  'globals': {
-    'ts-jest': {
-      'babelConfig': true,
-    },
-  },
   'testURL': 'https://www.somthing.com/test.html',
 };

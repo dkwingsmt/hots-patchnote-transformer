@@ -56,7 +56,7 @@ function getArticleTree(htmlText: string) {
   return articleTree;
 }
 
-function standardizeTree(node: parse5.DefaultTreeNode): Node {
+export function standardizeTree(node: parse5.DefaultTreeNode): Node {
   if (isTextNode(node)) {
     return {
       kind: 'text',
