@@ -2,7 +2,8 @@ import _ from 'lodash';
 import * as parse5 from 'parse5';
 
 import { Node } from './const';
-import { transformNgaNode } from './transform';
+import { generateBbsCode } from './generate';
+import { translateTree } from './translate';
 import { isElement, isParentNode, isTextNode } from './utils';
 
 function getArticleTreeTraverse(tree: parse5.DefaultTreeNode) {
@@ -72,6 +73,10 @@ export function standardizeTree(node: parse5.DefaultTreeNode): Node {
   };
 }
 
+function transformNgaNode(tree: Node): string {
+  return generateBbsCode(tree);
+}
+
 export function pageToNga({ htmlText, url }: { url?: string; htmlText: string }) {
   const tree = standardizeTree(getArticleTree(htmlText));
   const sourceStr = url ? `[quote]英文日志：${url}
@@ -80,5 +85,5 @@ export function pageToNga({ htmlText, url }: { url?: string; htmlText: string })
 
   return `[quote]转载请注明本帖来源NGA[s:a2:poi]
 [/quote]
-${sourceStr}${transformNgaNode(tree)}`;
+${sourceStr}${transformNgaNode(translateTree(tree))}`;
 }

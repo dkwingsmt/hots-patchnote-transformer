@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 
+import { Node } from './const';
 import i18nDict from './i18n';
 import { toI18nKey } from './utils';
 
@@ -451,6 +452,26 @@ function translatePhrase(origin: string): string {
   return translateToken(origin);
 }
 
-export function translate(origin: string) {
-  return translatePhrase(origin);
+export function translateTree(node: Node): Node {
+  if (node.kind === 'text') {
+
+    const replaced = node.text
+    .replace('’', '\'')
+    .replace(' ', ' ')
+    .replace('ú', 'u')
+    .replace(String.fromCharCode(10), ' ')
+    .replace(String.fromCharCode(8203), ' ');
+
+    const result = _.trim(replaced);
+
+    return {
+      ...node,
+      text: translatePhrase(result),
+    };
+  }
+
+  return {
+    ...node,
+    children: node.children.map(translateTree),
+  };
 }

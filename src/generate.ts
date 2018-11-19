@@ -2,7 +2,6 @@ import _ from 'lodash';
 
 import { findNearestColor } from './color';
 import { Attribute, Node } from './const';
-import { translate } from './translate';
 
 function parseStyle(node: Node): Record<string, string> {
   if (node.kind === 'text') {
@@ -59,19 +58,9 @@ function ensureNewlines(nodeText: string, startNum: number, endNum: number = 0) 
 }
 
 // tslint:disable-next-line:max-func-body-length cyclomatic-complexity
-export function transformNgaNode(node: Node, context: Record<string, unknown> = {}) {
+export function generateBbsCode(node: Node, context: Record<string, unknown> = {}) {
   if (node.kind === 'text') {
-    const replaced = node.text
-    .replace('’', '\'')
-    .replace(' ', ' ')
-    .replace(String.fromCharCode(10), ' ')
-    .replace(String.fromCharCode(8203), ' ');
-
-    const result = _.trim(replaced);
-    const translated = translate(result);
-
-    return translated
-      .replace('ú', 'u');
+    return node.text;
   }
   // <picture>: pick only the first child
   if (node.tag === 'picture') {
@@ -82,7 +71,7 @@ export function transformNgaNode(node: Node, context: Record<string, unknown> = 
     return '';
   }
   const style = parseStyle(node);
-  const childrenRaw = transformNgaNodeList(node.children);
+  const childrenRaw = generateBbsNodeList(node.children);
   let children = childrenRaw;
   if (style.color) {
     const ngaColor = findNearestColor(style.color);
@@ -188,12 +177,12 @@ export function transformNgaNode(node: Node, context: Record<string, unknown> = 
   }
 }
 
-function transformNgaNodeList(nodes: Node[]) {
+function generateBbsNodeList(nodes: Node[]) {
   let result = '';
   let prevNode: Node;
   let prevNewlines = 0;
   _.forEach(nodes, (node: Node) => {
-    const nodeText = transformNgaNode(node, { $prev: prevNode });
+    const nodeText = generateBbsCode(node, { $prev: prevNode });
     if (nodeText.length !== 0) {
       prevNode = node;
       const [trimmedNodeText, leftNewlines, rightNewlines] = trimNewlines(nodeText);
