@@ -238,18 +238,7 @@ function translatePreset(origin: string): string {
     [/^now (.*)$/i, (r: RegExpMatchArray) => `现在${translatePhrase(r[1])}`],
     [/^also (.*)$/i, (r: RegExpMatchArray) => `还会${translatePhrase(r[1])}`],
     [/^renamed to (.*)$/i, (r: RegExpMatchArray) => `重命名为${translatePhrase(r[1])}`],
-    [/^(.*?) (reduce|lower|decrease|increase)s?(?:e?d)? from ([\d.]*?) ?([^ ]*?) to ([\d.]*?)(.*?)$/ig,
-      (r: RegExpMatchArray) => `${statItems(r[1])}从${r[3]}${statUnits(r[4])}${buffAction(r[2])}到${r[5]}${statUnits(r[6])}`],
-    [/^(reduce|lower|decrease|increase)s?(?:e?d)? (.*?) from ([\d.]*?) ?([^ ]*?) to ([\d.]*?)(.*?)$/ig,
-      (r: RegExpMatchArray) => `${statItems(r[2])}从${r[3]}${statUnits(r[4])}${buffAction(r[1])}到${r[5]}${statUnits(r[6])}`],
-    [/^(lower|decrease|increase)s?(?:e?d)? (?:the )?(.*?)(?: of (.+))? by (an additional )?([\d.]+)(.*?)$/ig,
-      (r: RegExpMatchArray) =>
-        `将${translatePhrase(r[3])}${ifExist(r[3], '的')}` +
-        `${statItems(r[2])}${ifExist(r[4], '额外')}${buffAction(r[1])}${r[5]}${statUnits(r[6])}`],
-    [/^(?:the )?(.*?)(?: of (.+))? (lower|decrease|increase)s?(?:e?d)? by (an additional )?([\d.]+)(.*?)$/ig,
-      (r: RegExpMatchArray) =>
-        `${translatePhrase(r[2])}${ifExist(r[2], '的')}` +
-        `${statItems(r[1])}${ifExist(r[4], '额外')}${buffAction(r[3])}了${r[5]}${statUnits(r[6])}`],
+
     [/^(grants? ?)([+.0-9]+) ?(physical|spell)? armor$/gi,
       (r: RegExpMatchArray) =>
         `${ifExist(r[1], '给予')}${r[2]}` +
@@ -416,6 +405,111 @@ function translatePreset(origin: string): string {
   });
 
   return result;
+}
+
+interface IParsedUnit {
+  percentage: boolean;
+  unit: string;
+  per: string;
+}
+
+function parseUnit(str: string): IParsedUnit {
+  const matchPer = /(% )?(.*?)(?: per (.*))?/i.exec(str);
+  const percentage: boolean = !!(matchPer && _.trim(matchPer[1]));
+  const unit = matchPer ? _.trim(matchPer[2]) : '';
+  const per = matchPer ? _.trim(matchPer[3]) : '';
+
+  return {
+    unit,
+    percentage,
+    per,
+  };
+}
+
+function parsePerFromProperty(str: string): [string, string] {
+  const matchPer = /(.*) per (.*?)/ig.exec(str);
+  if (matchPer) {
+    return [_.trim(matchPer[1]), _.trim(matchPer[2])];
+  }
+
+  return [_.trim(str), ''];
+}
+
+function standardizeNum(numStr: string): string {
+  if (!numStr) {
+    return '';
+  }
+
+  if (numStr.startsWith('.')) {
+    return `0${numStr}`;
+  }
+
+  return numStr;
+}
+
+function translateProperty(origin: string): string {
+  if (!origin) {
+    return '';
+  }
+
+  const dict: Record<string, string> = {
+    health: '生命值',
+  };
+
+  return dict[origin] || origin || '';
+}
+
+function translateUnit(origin: string): string {
+  if (!origin) {
+    return '';
+  }
+
+  const dict: Record<string, string> = {
+    seconds: '秒',
+  };
+
+  return dict[origin] || origin || '';
+}
+
+function translatePer(origin: string): string {
+  if (!origin) {
+    return '';
+  }
+
+  return origin || '';
+}
+
+export function translateChange(origin: string): string | null {
+  const matches = /(.*? )?(?:(reduce|lower|decrease|increase)(?:s|e?d|) )?(.*? )?from ([\d.,]+)(%? [^.,]*?)? to ([\d.,]+)(%? [^.,]*)?/ig
+    .exec(origin);
+  if (!matches) {
+    return null;
+  }
+  const property = _.trim((matches[1] || '') + (matches[3] || '')).toLowerCase();
+  const specifiedTrend = matches[2].toLowerCase();
+  const fromNumStr = matches[4];
+  const fromUnit = matches[5] || '';
+  const toNumStr = matches[6];
+  const toUnit = matches[7] || '';
+
+  const trendUp = specifiedTrend ?
+    ['increase'].includes(specifiedTrend) :
+    _.trim(toNumStr, '%') > _.trim(fromNumStr, '%');
+  const fromUnitParsed = parseUnit(fromUnit);
+  const toUnitParsed = parseUnit(toUnit);
+  const [bareProperty, perFromProperty] = parsePerFromProperty(property);
+
+  const perStr = perFromProperty || fromUnitParsed.per || toUnitParsed.per;
+  const percentage = fromUnitParsed.percentage || toUnitParsed.percentage;
+
+  const afterProperty = translateProperty(bareProperty);
+  const afterTrend = trendUp ? '增加' : '降低';
+  const afterFromNum = standardizeNum(fromNumStr) + (percentage ? '%' : '');
+  const afterToNum = standardizeNum(toNumStr) + (percentage ? '%' : '');
+  const afterUnit = translateUnit(fromUnitParsed.unit || toUnitParsed.unit);
+  const afterPer = translatePer(perStr);
+
+  return `${afterPer}${afterProperty}从${afterFromNum}${afterUnit}${afterTrend}到${afterToNum}${afterUnit}`;
 }
 
 function translateToken(origin: string) {
