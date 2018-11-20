@@ -55,12 +55,12 @@ function splitColon(origin: string) {
   if (bracketResult) {
     const [
       _o, // tslint:disable-line:no-unused
-      body1, mid, body2,
+      body1, _mid, body2, // tslint:disable-line:no-unused
     ] = bracketResult;
 
     return [
       [body1, body2],
-      ([tBody1, tBody2]: [string, string]) => `${tBody1}${mid}${tBody2}`,
+      ([tBody1, tBody2]: [string, string]) => `${tBody1}：${tBody2}`,
     ];
   }
 
@@ -105,93 +105,6 @@ function splitXXXTalents(origin: string) {
   return null;
 }
 
-function statItems(o: string) {
-  const dict = {
-    cooldown: '冷却时间',
-    radius: '半径',
-    health: '生命值',
-    'base maximum health': '基础最大生命值',
-    'maximum base health': '基础最大生命值',
-    'base health': '基础生命值',
-    'base health regeneration': '基础生命回复',
-    'health bonus': '生命值加成',
-    healing: '治疗量',
-    heal: '治疗量',
-    'heal amount': '治疗量',
-    'bonus healing': '额外治疗量',
-    damage: '伤害',
-    'health gain': '生命加成',
-    'armor granted': '护甲加成',
-    'slow amount': '减速效果',
-    slow: '减速效果',
-    armor: '护甲',
-    'spell armor': '法术护甲',
-    'physical armor': '物理护甲',
-    'shield amount': '护盾量',
-    'health regeneration': '生命恢复速度',
-    'health regen': '生命恢复速度',
-    'basic attack damage': '普攻伤害',
-    'mana cost': '法力消耗',
-    'energy cost': '能量消耗',
-    'teleport range': '传送距离',
-    'explosion radius': '爆炸范围',
-    'movement speed': '移动速度',
-    'cast range': '施放距离',
-    charges: '可储存次数',
-    'cooldown reduction': '冷却时间减少量',
-    'duration bonus per attack': '每次攻击增加的持续时间',
-    'ghoul attack damage': '食尸鬼攻击速度',
-    'ghoul health': '食尸鬼生命',
-    'search arc': '搜寻弧度',
-    'vision range': '视野范围',
-    'stun duration': '昏迷持续时间',
-    duration: '持续时间',
-    'damage over time': '持续伤害',
-    'impact damage': '直接伤害',
-    'armor bonus': '护甲加成',
-    'silence duration': '沉默持续时间',
-    'maximum dash range': '最大冲刺距离',
-    'full charge up duration': '最大蓄力时间',
-    'maximum charge count': '最大储存层数',
-    'damage per second': '每秒伤害',
-    'basic attack range': '普通攻击范围',
-    'basic attack slow': '普通攻击减速效果',
-    'window between casts': '每次施法之间的最大时间间隔',
-    'bonus health': '生命值加成',
-    'sight radius bonus': '视野范围加成',
-    'movement speed bonus': '移动速度加成',
-    'base health regen': '基础生命回复',
-    'healing bonus': '治疗量加成',
-    'damage threshold': '伤害阈值',
-    'bonus damage': '伤害加成',
-    'damage bonus': '伤害加成',
-    'vision bonus': '视野加成',
-    'slow duration': '减速效果持续时间',
-    miscellaneous: '综合',
-    'damage reduction': '伤害减少量',
-    'heal reduction': '治疗降低效果',
-    'armor duration': '护甲持续时间',
-    'bonus range': '范围加成',
-    range: '范围',
-    'life leech': '生命吸取比例',
-    'bonus life leech': '生命吸取比例加成',
-    'splash damage': '溅射伤害',
-    'healing amount': '治疗量',
-    'bonus swing damage': '伤害加成',
-    'increased movement speed duration': '加速持续时间',
-    'bonus shield amount': '护盾量加成',
-    'cooldown reduction per basic attack': '每次普通攻击减少的冷却时间',
-    'attack speed': '普通攻击速度',
-    'attack damage': '普通攻击伤害',
-    'bounce damage': '弹跳伤害',
-    'root duration': '定身时间',
-    'movement speed slow': '移动速度减速效果',
-    'life steal amount': '生命吸取量',
-  };
-
-  return _.get(dict, _.trim(o.toLowerCase()).replace('the ', ''), _.trim(o));
-}
-
 function statUnits(o: string) {
   const dict = {
     second: '秒',
@@ -208,19 +121,6 @@ function statUnits(o: string) {
   };
 
   return _.get(dict, _.trim(o.toLowerCase()), _.trim(o));
-}
-
-function buffAction(o: string) {
-  const dict = [
-    [['increase'], '增加'],
-    [['decrease', 'reduce', 'lower'], '降低'],
-  ];
-  const found = dict.find(([froms]: [string[], string]) => froms.includes(o.toLowerCase()));
-  if (found) {
-    return found[1];
-  }
-
-  return o;
 }
 
 // tslint:disable-next-line:max-func-body-length
@@ -277,6 +177,7 @@ function translatePreset(origin: string): string {
     active: '主动',
     removed: '已移除',
     'new talent': '新天赋',
+    'quick navigation': '目录',
     talent: '天赋',
     trait: '特质',
     'new trait': '新特质',
@@ -287,6 +188,7 @@ function translatePreset(origin: string): string {
     'developer comments': '开发者评论',
     'ptr note': '测试服注释',
     general: '综合',
+    miscellaneous: '综合',
     art: '美术',
     shop: '商店',
     'user interface': '界面',
@@ -414,7 +316,7 @@ interface IParsedUnit {
 }
 
 function parseUnit(str: string): IParsedUnit {
-  const matchPer = /(% )?(.*?)(?: per (.*))?/i.exec(str);
+  const matchPer = /(% )?(.*)(?: per (.*))?/i.exec(str);
   const percentage: boolean = !!(matchPer && _.trim(matchPer[1]));
   const unit = matchPer ? _.trim(matchPer[2]) : '';
   const per = matchPer ? _.trim(matchPer[3]) : '';
@@ -427,7 +329,7 @@ function parseUnit(str: string): IParsedUnit {
 }
 
 function parsePerFromProperty(str: string): [string, string] {
-  const matchPer = /(.*) per (.*?)/ig.exec(str);
+  const matchPer = /(.*) per (.*)/i.exec(str);
   if (matchPer) {
     return [_.trim(matchPer[1]), _.trim(matchPer[2])];
   }
@@ -440,11 +342,13 @@ function standardizeNum(numStr: string): string {
     return '';
   }
 
+  let result = numStr
+    .replace(',', '');
   if (numStr.startsWith('.')) {
-    return `0${numStr}`;
+    result = `0${numStr}`;
   }
 
-  return numStr;
+  return result;
 }
 
 function cutPrefix(origin: string, prefixes: string | string[]): string {
@@ -469,17 +373,17 @@ function cutSuffix(origin: string, suffixes: string | string[]): string {
   return origin;
 }
 
+// tslint:disable-next-line:max-func-body-length
 function translateProperty(origin: string): string {
   if (!origin) {
     return '';
   }
 
   let tryingCutting = origin.toLowerCase();
-  let prefixBase: string = '';
+  let afterPrefixes: string = '';
   let prefixMinMax: string = '';
-  let suffixBonus: string = '';
-  let suffixRefund: string = '';
-  let suffixRegen: string = '';
+  let afterSuffixes: string = '';
+  let suffixAmount: string = '';
   while (true) {
     const beforeCutting = tryingCutting;
 
@@ -497,25 +401,62 @@ function translateProperty(origin: string): string {
 
     tryingCutting = cutPrefix(tryingCutting, 'base ');
     if (tryingCutting !== beforeCutting) {
-      prefixBase = '基础';
+      afterPrefixes += '基础';
       continue;
     }
 
-    tryingCutting = cutSuffix(tryingCutting, ' bonus');
+    tryingCutting = cutPrefix(tryingCutting, 'bonus ');
     if (tryingCutting !== beforeCutting) {
-      suffixBonus = '加成';
+      afterSuffixes += '加成';
+      continue;
+    }
+
+    tryingCutting = cutSuffix(tryingCutting, [' bonus', ' gain', 'granted']);
+    if (tryingCutting !== beforeCutting) {
+      afterSuffixes += '加成';
       continue;
     }
 
     tryingCutting = cutSuffix(tryingCutting, ' refund');
     if (tryingCutting !== beforeCutting) {
-      suffixRefund = '返还';
+      afterSuffixes += '返还';
       continue;
     }
 
-    tryingCutting = cutSuffix(tryingCutting, ' regen');
+    tryingCutting = cutSuffix(tryingCutting, [' regen', ' regeneration']);
     if (tryingCutting !== beforeCutting) {
-      suffixRegen = '回复速度';
+      afterSuffixes += '回复速度';
+      continue;
+    }
+
+    tryingCutting = cutSuffix(tryingCutting, ' duration');
+    if (tryingCutting !== beforeCutting) {
+
+      tryingCutting = cutSuffix(tryingCutting, ' reduction');
+      if (tryingCutting !== beforeCutting) {
+        afterSuffixes += '降低效果持续时间';
+        continue;
+      }
+
+      afterSuffixes += '持续时间';
+      continue;
+    }
+
+    tryingCutting = cutSuffix(tryingCutting, ' reduction');
+    if (tryingCutting !== beforeCutting) {
+      afterSuffixes += '降低量';
+      continue;
+    }
+
+    tryingCutting = cutSuffix(tryingCutting, ' increase');
+    if (tryingCutting !== beforeCutting) {
+      afterSuffixes += '增加量';
+      continue;
+    }
+
+    tryingCutting = cutSuffix(tryingCutting, ' amount');
+    if (tryingCutting !== beforeCutting) {
+      suffixAmount += '量';
       continue;
     }
 
@@ -526,13 +467,66 @@ function translateProperty(origin: string): string {
     health: '生命值',
     mana: '法力',
     'mana cost': '法力消耗',
+    'energy cost': '能量消耗',
+    cooldown: '冷却时间',
+    radius: '半径',
+    range: '范围',
+    healing: '治疗量',
+    heal: '治疗量',
+    damage: '伤害',
+    armor: '护甲',
+    shield: '护盾',
+    'spell armor': '法术护甲',
+    'physical armor': '物理护甲',
+    vision: '视野',
+    'vision range': '视野范围',
+    'sight radius': '视野范围',
+    charges: '可储存次数',
+    'movement speed': '移动速度',
+    'spell power': '法力强度',
+
+    'basic attack': '普通攻击',
+    'attack speed': '普通攻击速度',
+    'basic attack speed': '普通攻击速度',
+    'attack damage': '普通攻击伤害',
+    'basic attack damage': '普通攻击伤害',
+    'basic attack range': '普通攻击范围',
+
+    'movement speed slow': '减速效果',
+    'increased movement speed': '加速效果',
+    slow: '减速效果',
+    root: '定身',
+    silence: '沉默',
+    stun: '昏迷',
+
+    'cast range': '施放距离',
+    'full charge up': '最大蓄力',
+    'life leech': '生命吸取',
+    'search arc': '搜寻弧度',
+
+    duration: '持续时间',
+    'spell damage': '法术伤害',
+    'physical damage': '物理伤害',
+    'damage over time': '持续伤害',
+    'splash damage': '溅射伤害',
+    'impact damage': '直接伤害',
+    'window between casts': '每次施法之间的最大时间间隔',
+    'damage threshold': '伤害阈值',
+    'dash range': '冲刺距离',
+    'charge count': '储存层数',
+    'explosion radius': '爆炸范围',
+    'teleport range': '传送距离',
   };
+
   const afterRoot = rootDict[tryingCutting] || tryingCutting;
+  if (afterRoot.endsWith('量')) {
+    suffixAmount = '';
+  }
 
   return _.join(
-    [prefixBase, prefixMinMax,
+    [afterPrefixes, prefixMinMax,
       afterRoot,
-      suffixBonus, suffixRefund, suffixRegen],
+      suffixAmount, afterSuffixes],
     '',
   );
 }
@@ -544,17 +538,25 @@ function translateUnit(origin: string): string {
 
   const dict: Record<string, string> = {
     seconds: '秒',
+    second: '秒',
   };
 
   return dict[origin] || origin || '';
 }
 
-function translatePer(origin: string): string {
+function translatePer(origin: string): [string, string] {
   if (!origin) {
-    return '';
+    return ['', ''];
   }
 
-  return origin || '';
+  const dict: Record<string, [string, string]> = {
+    'basic attack': ['每次普通攻击的', ''],
+    stack: ['每层的', ''],
+    second: ['', '每秒'],
+    tick: ['', '每跳'],
+  };
+
+  return dict[origin] || [`每${origin || ''}的`, ''];
 }
 
 export function translateChange(origin: string): string | null {
@@ -564,7 +566,7 @@ export function translateChange(origin: string): string | null {
     return null;
   }
   const property = _.trim(matches[1] || '').toLowerCase();
-  const specifiedTrend = matches[2].toLowerCase();
+  const specifiedTrend = (matches[2] || '').toLowerCase();
   const fromNumStr = matches[3];
   const fromUnit = matches[4] || '';
   const toNumStr = matches[5];
@@ -585,15 +587,20 @@ export function translateChange(origin: string): string | null {
   const afterFromNum = standardizeNum(fromNumStr) + (percentage ? '%' : '');
   const afterToNum = standardizeNum(toNumStr) + (percentage ? '%' : '');
   const afterUnit = translateUnit(fromUnitParsed.unit || toUnitParsed.unit);
-  const afterPer = translatePer(perStr);
+  const [afterPerAtStart, afterPerAtNum] = translatePer(perStr);
 
-  return `${afterPer}${afterProperty}从${afterFromNum}${afterUnit}${afterTrend}到${afterToNum}${afterUnit}`;
+  return `${afterPerAtStart}${afterProperty}从${afterPerAtNum}${afterFromNum}${afterUnit}${afterTrend}到${afterToNum}${afterUnit}`;
 }
 
 function translateToken(origin: string) {
   const queryResult = i18nDict[toI18nKey(origin)];
   if (queryResult) {
     return queryResult[0][0];
+  }
+
+  const tryChange = translateChange(origin);
+  if (tryChange) {
+    return tryChange;
   }
 
   return translatePreset(origin);
@@ -603,6 +610,14 @@ function translatePhrase(origin: string): string {
   if (!origin) {
     return '';
   }
+  if (
+    // tslint:disable-next-line:no-http-string
+    origin.startsWith('http://') ||
+    origin.startsWith('https://')
+  ) {
+    return origin;
+  }
+
   let validSplit: [string[], (v: string[]) => string] | undefined;
   _.forEach(
     [splitBracket, splitSquareBracket, splitColon, splitXXXTalents, splitDash],
