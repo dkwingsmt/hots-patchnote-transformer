@@ -11,6 +11,7 @@
   "rules": {
     "no-submodule-imports": false,
     "no-relative-imports": false,
+    "no-constant-condition": false,
     "trailing-comma": [true, {"multiline": "always", "singleline": "never", "esSpecCompliant": true}],
     "missing-jsdoc": false,
     "jsx-boolean-value": false,

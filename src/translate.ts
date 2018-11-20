@@ -447,16 +447,94 @@ function standardizeNum(numStr: string): string {
   return numStr;
 }
 
+function cutPrefix(origin: string, prefixes: string | string[]): string {
+  const prefixesArr = typeof prefixes === 'string' ? [prefixes] : prefixes;
+  for (const prefix of prefixesArr) {
+    if (origin.startsWith(prefix)) {
+      return origin.slice(prefix.length);
+    }
+  }
+
+  return origin;
+}
+
+function cutSuffix(origin: string, suffixes: string | string[]): string {
+  const suffixesArr = typeof suffixes === 'string' ? [suffixes] : suffixes;
+  for (const suffix of suffixesArr) {
+    if (origin.endsWith(suffix)) {
+      return origin.slice(0, origin.length - suffix.length);
+    }
+  }
+
+  return origin;
+}
+
 function translateProperty(origin: string): string {
   if (!origin) {
     return '';
   }
 
-  const dict: Record<string, string> = {
-    health: '生命值',
-  };
+  let tryingCutting = origin.toLowerCase();
+  let prefixBase: string = '';
+  let prefixMinMax: string = '';
+  let suffixBonus: string = '';
+  let suffixRefund: string = '';
+  let suffixRegen: string = '';
+  while (true) {
+    const beforeCutting = tryingCutting;
 
-  return dict[origin] || origin || '';
+    tryingCutting = cutPrefix(tryingCutting, ['max ', 'maximum ']);
+    if (tryingCutting !== beforeCutting) {
+      prefixMinMax = '最大';
+      continue;
+    }
+
+    tryingCutting = cutPrefix(tryingCutting, ['min ', 'minimum ']);
+    if (tryingCutting !== beforeCutting) {
+      prefixMinMax = '最小';
+      continue;
+    }
+
+    tryingCutting = cutPrefix(tryingCutting, 'base ');
+    if (tryingCutting !== beforeCutting) {
+      prefixBase = '基础';
+      continue;
+    }
+
+    tryingCutting = cutSuffix(tryingCutting, ' bonus');
+    if (tryingCutting !== beforeCutting) {
+      suffixBonus = '加成';
+      continue;
+    }
+
+    tryingCutting = cutSuffix(tryingCutting, ' refund');
+    if (tryingCutting !== beforeCutting) {
+      suffixRefund = '返还';
+      continue;
+    }
+
+    tryingCutting = cutSuffix(tryingCutting, ' regen');
+    if (tryingCutting !== beforeCutting) {
+      suffixRegen = '回复速度';
+      continue;
+    }
+
+    break;
+  }
+
+  const rootDict: Record<string, string> = {
+    health: '生命值',
+    mana: '法力',
+    'mana cost': '法力消耗',
+  };
+  const afterRoot = rootDict[tryingCutting] || tryingCutting;
+
+  return _.join(
+    [prefixBase, prefixMinMax,
+      afterRoot,
+      suffixBonus, suffixRefund, suffixRegen],
+    '',
+  );
 }
 
 function translateUnit(origin: string): string {
@@ -480,17 +558,17 @@ function translatePer(origin: string): string {
 }
 
 export function translateChange(origin: string): string | null {
-  const matches = /(.*? )?(?:(reduce|lower|decrease|increase)(?:s|e?d|) )?(.*? )?from ([\d.,]+)(%? [^.,]*?)? to ([\d.,]+)(%? [^.,]*)?/ig
+  const matches = /(.*? )(?:(reduce|lower|decrease|increase)(?:s|e?d|) )?from ([\d.,]+)(%? [^.,]*?)? to ([\d.,]+)(%? [^.,]*)?/ig
     .exec(origin);
   if (!matches) {
     return null;
   }
-  const property = _.trim((matches[1] || '') + (matches[3] || '')).toLowerCase();
+  const property = _.trim(matches[1] || '').toLowerCase();
   const specifiedTrend = matches[2].toLowerCase();
-  const fromNumStr = matches[4];
-  const fromUnit = matches[5] || '';
-  const toNumStr = matches[6];
-  const toUnit = matches[7] || '';
+  const fromNumStr = matches[3];
+  const fromUnit = matches[4] || '';
+  const toNumStr = matches[5];
+  const toUnit = matches[6] || '';
 
   const trendUp = specifiedTrend ?
     ['increase'].includes(specifiedTrend) :
