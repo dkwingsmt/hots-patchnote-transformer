@@ -105,6 +105,10 @@ function splitXXXTalents(origin: string) {
   return null;
 }
 
+function strEq(a: string, b: string): boolean {
+  return a.toLowerCase() === b.toLowerCase();
+}
+
 // tslint:disable-next-line:max-func-body-length
 function translatePreset(origin: string): string {
   type Preset = [
@@ -122,9 +126,9 @@ function translatePreset(origin: string): string {
     [/^also (.*)$/i, (r: RegExpMatchArray) => `还会${translatePhrase(r[1])}`],
     [/^renamed to (.*)$/i, (r: RegExpMatchArray) => `重命名为${translatePhrase(r[1])}`],
     [/^(unranked|ranked|) battleground rotation$/i,
-      (r: RegExpMatchArray) => `${r[1] === 'unranked' ? '非排名模式' : r[1] === 'ranked' ? '排名模式' : ''}战场轮换`],
+      (r: RegExpMatchArray) => `${strEq(r[1], 'unranked') ? '非排名模式' : strEq(r[1], 'ranked') ? '排名模式' : ''}战场轮换`],
     [/^the battleground rotation for all (unranked|ranked) modes has been adjusted to the following$/i,
-      (r: RegExpMatchArray) => `所有${r[1] === 'unranked' ? '非排名模式' : r[1] === 'ranked' ? '排名模式' : ''}的战场轮换的地图池已调整为如下`],
+      (r: RegExpMatchArray) => `所有${strEq(r[1], 'unranked') ? '非排名模式' : strEq(r[1], 'ranked') ? '排名模式' : ''}的战场轮换的地图池已调整为如下`],
 
     [/^(grants? ?)([+.0-9]+) ?(physical|spell)? armor$/gi,
       (r: RegExpMatchArray) =>
@@ -579,7 +583,7 @@ function translatePer(origin: string): [string, string] {
   return dict[plural] || [`每${origin || ''}的`, ''];
 }
 
-export function translateChange(origin: string): string | null {
+export function translateChangeFromTo(origin: string): string | null {
   const matches = /(.*? )(?:(reduce|lower|decrease|increase)(?:s|e?d|) )?from ([\d.,]+)(%? [^.,]*?)? to ([\d.,]+)(%? [^.,]*)?/ig
     .exec(origin);
   if (!matches) {
@@ -618,7 +622,7 @@ function translateToken(origin: string) {
     return queryResult[0][0];
   }
 
-  const tryChange = translateChange(origin);
+  const tryChange = translateChangeFromTo(origin);
   if (tryChange) {
     return tryChange;
   }
