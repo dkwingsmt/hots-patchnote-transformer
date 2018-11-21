@@ -134,7 +134,8 @@ function translatePreset(origin: string): string {
     [/^Moved from level (\d*) to level (\d*).?$/i, '从$1级移到$2级'],
     [/^Moved from level (\d*).?$/i, '移自$1级'],
     [/^Moved to level (\d*).?$/i, '移至$1级'],
-    [/^heroes of the storm (ptr )?patch notes$/gi, (r: RegExpMatchArray) => `《风暴英雄》${ifExist(r[1], '公开测试服')}更新说明`],
+    [/^heroes of the storm (ptr )?(balance )?patch notes$/gi, (r: RegExpMatchArray) =>
+      `《风暴英雄》${ifExist(r[1], '公开测试服')}${ifExist(r[2], '')}更新说明`],
     [/^now (.*)$/i, (r: RegExpMatchArray) => `现在${translatePhrase(r[1])}`],
     [/^also (.*)$/i, (r: RegExpMatchArray) => `还会${translatePhrase(r[1])}`],
     [/^renamed to (.*)$/i, (r: RegExpMatchArray) => `重命名为${translatePhrase(r[1])}`],
@@ -158,18 +159,32 @@ function translatePreset(origin: string): string {
     [/^available starting the week of ([^ ]+ [0-9]+) until ([^ ]+ [0-9]+).?$/i,
       (r: RegExpMatchArray) => `将从${moment(r[1], 'MMM D').format('M月D日')}当周开始上线，${moment(r[2], 'MMM D').format('M月D日')}截止。`],
   ];
-  const validre = regexps.find(([re]: Preset) => !!re.exec(origin));
-  if (validre) {
-    const replaceTo = validre[1];
-    if (typeof replaceTo === 'string') {
-      return origin.replace(validre[0], replaceTo);
-    }
-    const matched = validre[0].exec(origin);
-    if (!matched) {
-      return origin;
-    }
 
-    return replaceTo(matched);
+  // Find the first `preset` that whose `preset`[0] matches `origin`,
+  // then use `preset`[1] to replace it
+  const replacedStr = _.reduce<Preset, string | undefined>(
+    regexps,
+    (prev: string | undefined, [re, replaceTo]: Preset) => {
+      if (prev != null) {
+        return prev;
+      }
+
+      const matchResult = re.exec(origin);
+      if (!matchResult) {
+        return undefined;
+      }
+
+      if (typeof replaceTo === 'function') {
+        return replaceTo(matchResult);
+      }
+
+      return origin.replace(re, replaceTo);
+    },
+    undefined,
+  );
+
+  if (replacedStr != null) {
+    return replacedStr;
   }
 
   const presets: Record<string, string> = {
