@@ -28,7 +28,12 @@ function transform(s, url) {
 
 const jssClasses = {
   optionSection: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    margin: 10,
+  },
 
+  rightOption: {
   },
 
   textFieldTransformedInput: {
@@ -178,12 +183,29 @@ function Form({ classes }) {
           changeUrl(evt.target.value);
         }}
         onKeyDown={(evt) => {
-          if (evt.ctrlKey && keycode.isEventKey(evt, 'enter')) {
+          if (keycode.isEventKey(evt, 'enter')) {
             start();
           }
         }}
       />
-      <div key="options" className={classes.optionSection} />
+      <div key="options" className={classes.optionSection}>
+        <div className={classes.rightOption}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={start}
+            disabled={loaderState.loading}
+            classes={{
+            }}
+          >
+            {
+              loaderState.loading ?
+                '获取中……' :
+                '转换（回车）'
+            }
+          </Button>
+        </div>
+      </div>
       {loaderState.error && (
         <div key="error" className={classes.errorSection} >
           {loaderState.error.toString()}

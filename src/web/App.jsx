@@ -74,18 +74,7 @@ function App({ classes }) {
             说明
           </Typography>
           <Typography>
-            本工具用于将 bbs.nga.com 会自动隐藏的特殊符号转换为 HTML 编码的形式。
-          </Typography>
-          <Typography>
-            本工具只会转换选定范围的字符。如想新增范围，请至
-            <a
-              href="https://github.com/dkwingsmt/hots-patchnote-transformer/issues/new"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              这里
-            </a>
-            提出。
+            本工具获取目标地址的《风暴英雄》更新日志，并将其转换为 bbs.nga.com 能使用的论坛代码的形式。
           </Typography>
         </div>
       </Grid>

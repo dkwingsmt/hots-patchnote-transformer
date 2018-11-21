@@ -16,6 +16,7 @@
     "predeploy": "yarn run build",
     "deploy": "gh-pages -d build"
   },
+  "homepage" : "http://tong.mu/hots-patchnote-transformer",
   "repository": {
     "type": "git",
     "url": "https://github.com/dkwingsmt/hots-patchnote-transformer"
