@@ -139,6 +139,10 @@ function translatePreset(origin: string): string {
     [/^now (.*)$/i, (r: RegExpMatchArray) => `现在${translatePhrase(r[1])}`],
     [/^also (.*)$/i, (r: RegExpMatchArray) => `还会${translatePhrase(r[1])}`],
     [/^renamed to (.*)$/i, (r: RegExpMatchArray) => `重命名为${translatePhrase(r[1])}`],
+    [/^(unranked|ranked|) battleground rotation$/i,
+      (r: RegExpMatchArray) => `${r[1] === 'unranked' ? '非排名模式' : r[1] === 'ranked' ? '排名模式' : ''}战场轮换`],
+    [/^the battleground rotation for all (unranked|ranked) modes has been adjusted to the following$/i,
+      (r: RegExpMatchArray) => `所有${r[1] === 'unranked' ? '非排名模式' : r[1] === 'ranked' ? '排名模式' : ''}的战场轮换的地图池已调整为如下`],
 
     [/^(grants? ?)([+.0-9]+) ?(physical|spell)? armor$/gi,
       (r: RegExpMatchArray) =>
@@ -188,6 +192,10 @@ function translatePreset(origin: string): string {
   }
 
   const presets: Record<string, string> = {
+    'hanamura temple': '花村寺',
+    'alterac pass': '奥特兰克战道',
+    'towers of doom': '末日塔',
+
     passive: '被动',
     active: '主动',
     removed: '已移除',
@@ -221,14 +229,18 @@ function translatePreset(origin: string): string {
     'removed bundles': '下架的礼包',
     skins: '新皮肤',
     'new skins': '新皮肤',
+    'new portraits, sprays, and emojis': '新头像、新喷漆和新表情',
     'returning skins': '重新上架的皮肤',
     'removed skins': '下架的皮肤',
+    'new mount': '新坐骑',
     assassin: '刺杀型',
     'multi-class': '混合型',
     specialist: '专业型',
     support: '辅助型',
     warrior: '战斗型',
     warriors: '战斗型',
+    minions: '小兵',
+    mercenaries: '雇佣兵',
     quest: '任务',
     '!quest': '任务',
     reward: '奖励',

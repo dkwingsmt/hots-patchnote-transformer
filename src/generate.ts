@@ -123,6 +123,7 @@ export function generateBbsCode(node: Node, context: Record<string, unknown> = {
   case 'span':
   case 'a':
   case 'div':
+  case 'font':
     return children;
 
   case 'p':
