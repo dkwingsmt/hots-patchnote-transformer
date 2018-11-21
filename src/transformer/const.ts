@@ -14,3 +14,8 @@ export interface IParentNode {
   children: Node[];
   attrs: Attribute[];
 }
+
+export interface IPageInfo {
+  url?: string;
+  htmlText: string;
+}

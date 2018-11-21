@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import moment from 'moment';
 
+import i18nDict from '../external/i18n';
 import { Node } from './const';
-import i18nDict from './i18n';
 import { toI18nKey } from './utils';
 
 function ifExist(flag: string, str: string | ((s: string) => string)): string {
@@ -16,7 +16,9 @@ function ifExist(flag: string, str: string | ((s: string) => string)): string {
   return str;
 }
 
-function splitBracket(origin: string) {
+type SplitResult = [string[], (...v: string[]) => string] | null;
+
+function splitBracket(origin: string): SplitResult {
   const bracketResult = /^(.*?)( *)\(([^)]*)\)( *)(.*?)$/g.exec(origin);
   if (bracketResult) {
     const [
@@ -26,14 +28,14 @@ function splitBracket(origin: string) {
 
     return [
       [body1, body2, body3],
-      ([tBody1, tBody2, tBody3]: [string, string, string]) => `${tBody1}${space1}(${tBody2})${space2}${tBody3}`,
+      (tBody1: string, tBody2: string, tBody3: string) => `${tBody1}${space1}(${tBody2})${space2}${tBody3}`,
     ];
   }
 
   return null;
 }
 
-function splitSquareBracket(origin: string) {
+function splitSquareBracket(origin: string): SplitResult {
   const bracketResult = /^(.*?)( *)\[([^ )])\]( *)(.*?)$/g.exec(origin);
   if (bracketResult) {
     const [
@@ -43,14 +45,14 @@ function splitSquareBracket(origin: string) {
 
     return [
       [body1, body2, body3],
-      ([tBody1, tBody2, tBody3]: [string, string, string]) => `${tBody1}${space1}(${tBody2})${space2}${tBody3}`,
+      (tBody1: string, tBody2: string, tBody3: string) => `${tBody1}${space1}(${tBody2})${space2}${tBody3}`,
     ];
   }
 
   return null;
 }
 
-function splitColon(origin: string) {
+function splitColon(origin: string): SplitResult {
   const bracketResult = /^(.*?)( *: *)(.*)$/g.exec(origin);
   if (bracketResult) {
     const [
@@ -60,14 +62,14 @@ function splitColon(origin: string) {
 
     return [
       [body1, body2],
-      ([tBody1, tBody2]: [string, string]) => `${tBody1}：${tBody2}`,
+      (tBody1: string, tBody2: string) => `${tBody1}：${tBody2}`,
     ];
   }
 
   return null;
 }
 
-function splitDash(origin: string) {
+function splitDash(origin: string): SplitResult {
   const dashResult = /^(.*?)( *)[—–-]( *)(.*)$/g.exec(origin);
 
   if (dashResult) {
@@ -81,14 +83,14 @@ function splitDash(origin: string) {
 
     return [
       [body1, body2],
-      ([tBody1, tBody2]: [string, string]) => `${tBody1}${space1 && ' '}-${space2 && ' '}${tBody2}`,
+      (tBody1: string, tBody2: string) => `${tBody1}${space1 && ' '}-${space2 && ' '}${tBody2}`,
     ];
   }
 
   return null;
 }
 
-function splitXXXTalents(origin: string) {
+function splitXXXTalents(origin: string): SplitResult {
   const bracketResult = /^(.*?) TALENTS$/g.exec(origin);
   if (bracketResult) {
     const [
@@ -98,7 +100,7 @@ function splitXXXTalents(origin: string) {
 
     return [
       [name],
-      ([tName]: [string]) => `${tName}天赋`,
+      (tName: string) => `${tName}天赋`,
     ];
   }
 
@@ -642,10 +644,10 @@ export function translatePhrase(origin: string): string {
     return origin;
   }
 
-  let validSplit: [string[], (v: string[]) => string] | undefined;
+  let validSplit: [string[], (...v: string[]) => string] | undefined;
   _.forEach(
     [splitBracket, splitSquareBracket, splitColon, splitXXXTalents, splitDash],
-    (splitMethod: (s: string) => [string[], (v: string[]) => string]) => {
+    (splitMethod: (s: string) => SplitResult) => {
       const splitResult = splitMethod(origin);
       if (splitResult) {
         validSplit = splitResult;
@@ -657,7 +659,7 @@ export function translatePhrase(origin: string): string {
   if (validSplit) {
     const [originTokens, recoverFunc] = validSplit;
 
-    return recoverFunc(originTokens.map(translatePhrase));
+    return recoverFunc(...originTokens.map(translatePhrase));
   }
 
   return translateToken(origin);

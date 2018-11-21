@@ -4,9 +4,14 @@ import _ from 'lodash';
 import { argv, exit } from 'process';
 import rp from 'request-promise';
 
-import { pageToNga } from './http';
+import { pageToBbsCode } from './transformer';
 
-async function getPageFromUrl(url: string) {
+export interface IPageInfo {
+  url?: string;
+  htmlText: string;
+}
+
+async function getPageFromUrl(url: string): Promise<IPageInfo> {
   const htmlText = <string>(await rp(
     url,
     {
@@ -26,7 +31,7 @@ async function getPageFromUrl(url: string) {
 //   return {htmlText}
 // }
 
-async function getPageFromFile(filePath: string) {
+async function getPageFromFile(filePath: string): Promise<IPageInfo> {
   const task = new Bluebird<string>(
     (resolve: (c: string) => void, reject: (e: Error) => void) => {
       fs.readFile(
@@ -68,11 +73,11 @@ async function main() {
   const src = argSource();
   const task = sourceIsUrl(src) ?
     getPageFromUrl(src) : getPageFromFile(src);
-  let content: {htmlText: string; url?: string};
+  let content: IPageInfo;
   try {
     content = await task;
     // tslint:disable-next-line:no-console
-    console.log(pageToNga(content));
+    console.log(pageToBbsCode(content));
   } catch (e) {
     console.error(e.stack);
     exit(1);

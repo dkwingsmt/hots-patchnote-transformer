@@ -1,0 +1,1 @@
+export { pageToBbsCode } from './html';

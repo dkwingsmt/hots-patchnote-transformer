@@ -1,6 +1,6 @@
-import space from 'color-space';
-import DeltaE from 'delta-e';
 import _ from 'lodash';
+
+import { colorSpace as space, DeltaE } from './color-imports';
 
 type ArrayColor = [number, number, number];
 

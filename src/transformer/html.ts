@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import * as parse5 from 'parse5';
 
-import { Node } from './const';
+import { IPageInfo, Node } from './const';
 import { generateBbsCode } from './generate';
 import { translateTree } from './translate';
 import { isElement, isParentNode, isTextNode } from './utils';
@@ -77,7 +77,7 @@ function transformNgaNode(tree: Node): string {
   return generateBbsCode(tree);
 }
 
-export function pageToNga({ htmlText, url }: { url?: string; htmlText: string }) {
+export function pageToBbsCode({ htmlText, url }: IPageInfo) {
   const tree = standardizeTree(getArticleTree(htmlText));
   const sourceStr = url ? `[quote]英文日志：${url}
 [/quote]

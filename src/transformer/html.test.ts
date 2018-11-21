@@ -1,6 +1,6 @@
 import * as parse5 from 'parse5';
 
-import { standardizeTree } from './http';
+import { standardizeTree } from './html';
 
 describe('test standardizeTree()', () => {
   test('result must match', () => {
