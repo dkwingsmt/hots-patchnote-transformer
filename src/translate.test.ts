@@ -1,4 +1,4 @@
-import { translateChange } from './translate';
+import { translateChange, translatePhrase } from './translate';
 
 describe('test translateChange', () => {
   test('base', () => {
@@ -23,5 +23,13 @@ describe('test translateChange', () => {
     expect(
       translateChange('Duration reduced from 2 to .5 second'),
     ).toBe('持续时间从2秒降低到0.5秒');
+  });
+});
+
+describe('test translatePhrase', () => {
+  describe('certain translations', () => {
+    expect(
+      translatePhrase('Heroes of the Storm Patch Notes – October 16, 2018'),
+    ).toBe('《风暴英雄》更新说明 - 2018年10月16日');
   });
 });

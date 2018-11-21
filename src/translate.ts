@@ -105,24 +105,6 @@ function splitXXXTalents(origin: string) {
   return null;
 }
 
-function statUnits(o: string) {
-  const dict = {
-    second: '秒',
-    seconds: '秒',
-    games: '场游戏',
-    stacks: '层',
-    'seconds.': '秒',
-    'per second': '每秒',
-    'per stack': '每层',
-    range: '',
-    '% max health': '最大生命值',
-    '% maximum health': '最大生命值',
-    '% of maximum health': '最大生命值',
-  };
-
-  return _.get(dict, _.trim(o.toLowerCase()), _.trim(o));
-}
-
 // tslint:disable-next-line:max-func-body-length
 function translatePreset(origin: string): string {
   type Preset = [
@@ -267,7 +249,6 @@ function translatePreset(origin: string): string {
     'basic abilities': '基本技能',
     'heroic abilities': '终极技能',
     'return to top': '',
-    'heroes of the storm balance update': '《风暴英雄》平衡更新说明',
     'the following heroes, abilities, and talents have received updated visual effects':
       '以下英雄、技能和天赋获得了视觉效果更新',
     'the following heroes have received updated icon art to coincide with their reworks':
@@ -289,9 +270,7 @@ function translatePreset(origin: string): string {
     'price reduction': '价格变动',
     'heroes brawl': '风暴乱斗',
     emojis: '表情',
-    minions: '小兵',
     'try mode': '试用模式',
-    mercenaries: '雇佣兵',
     defender: '防御者',
     laner: '推进者',
     forts: '堡垒',
@@ -563,12 +542,25 @@ function translateUnit(origin: string): string {
     return '';
   }
 
+  const plural = pluralize(origin);
   const dict: Record<string, string> = {
     seconds: '秒',
-    second: '秒',
   };
 
-  return dict[origin] || origin || '';
+  return dict[plural] || origin || '';
+}
+
+function pluralize(origin: string): string {
+  let plural = origin;
+  if (!origin.endsWith('s')) {
+    if (origin.endsWith('e')) {
+      plural += 's';
+    } else {
+      plural += 'es';
+    }
+  }
+
+  return plural;
 }
 
 function translatePer(origin: string): [string, string] {
@@ -576,14 +568,15 @@ function translatePer(origin: string): [string, string] {
     return ['', ''];
   }
 
+  const plural = pluralize(origin);
   const dict: Record<string, [string, string]> = {
-    'basic attack': ['每次普通攻击的', ''],
-    stack: ['每层的', ''],
-    second: ['', '每秒'],
-    tick: ['', '每跳'],
+    'basic attacks': ['每次普通攻击的', ''],
+    stacks: ['每层的', ''],
+    seconds: ['', '每秒'],
+    ticks: ['', '每跳'],
   };
 
-  return dict[origin] || [`每${origin || ''}的`, ''];
+  return dict[plural] || [`每${origin || ''}的`, ''];
 }
 
 export function translateChange(origin: string): string | null {
@@ -633,7 +626,7 @@ function translateToken(origin: string) {
   return translatePreset(origin);
 }
 
-function translatePhrase(origin: string): string {
+export function translatePhrase(origin: string): string {
   if (!origin) {
     return '';
   }
