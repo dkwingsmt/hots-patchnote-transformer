@@ -1,6 +1,7 @@
-/* global fetch */
+/* global localStorage */
 import React, { useState, useReducer, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 import keycode from 'keycode';
 import jsonp from 'jsonp';
 
@@ -18,6 +19,8 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 
 import { pageToBbsCode } from '../transformer';
+
+const LS_KEY_LAST_URL = 'hots-patchnote-transform/last-url';
 
 function transform(s, url) {
   return pageToBbsCode({
@@ -56,7 +59,7 @@ const loaderInitState = {
   loading: false,
   error: null,
   raw: null,
-  url: null,
+  contentUrl: null,
   taskId: 0,
 };
 
@@ -68,7 +71,7 @@ function loaderReducer(state, action) {
       loading: true,
       error: null,
       raw: null,
-      url: action.url,
+      contentUrl: action.url,
       taskId: action.taskId,
     };
 
@@ -82,7 +85,7 @@ function loaderReducer(state, action) {
       loading: false,
       error: action.error,
       raw: null,
-      url: null,
+      contentUrl: null,
     };
 
   case 'RESOLVE':
@@ -133,13 +136,20 @@ async function fetchWithJsonp(url, options) {
 }
 
 function Form({ classes }) {
-  const [url, changeUrl] = useState('');
+  const [url, changeUrl] = useState(localStorage.getItem(LS_KEY_LAST_URL) || '');
   const [loaderState, loaderDispatch] = useReducer(
     loaderReducer,
     loaderInitState,
   );
   const transformedRef = useRef(null);
   const memoTransform = useCallback(transform);
+  const rememberLastUrl = useCallback(_.throttle(
+    (lastUrl) => {
+      localStorage.setItem(LS_KEY_LAST_URL, lastUrl);
+    },
+    500,
+    { leading: false, trailing: true },
+  ));
 
   async function start() {
     const myTaskId = loaderState.taskId + 1;
@@ -181,6 +191,7 @@ function Form({ classes }) {
         value={url}
         onChange={(evt) => {
           changeUrl(evt.target.value);
+          rememberLastUrl(evt.target.value);
         }}
         onKeyDown={(evt) => {
           if (keycode.isEventKey(evt, 'enter')) {
@@ -224,7 +235,7 @@ function Form({ classes }) {
         className={classes.textFieldTransformed}
         label="转换后"
         placeholder="这里将显示转换后的文字"
-        value={loaderState.raw ? memoTransform(loaderState.raw, loaderState.url) : ''}
+        value={loaderState.raw ? memoTransform(loaderState.raw, loaderState.contentUrl) : ''}
       />
     </Grid>
   );
