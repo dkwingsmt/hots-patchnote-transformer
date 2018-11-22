@@ -1,5 +1,5 @@
 /* global localStorage */
-import React, { useState, useReducer, useRef, useCallback } from 'react';
+import React, { useState, useReducer, useRef, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import keycode from 'keycode';
@@ -142,7 +142,6 @@ function Form({ classes }) {
     loaderInitState,
   );
   const transformedRef = useRef(null);
-  const memoTransform = useCallback(transform);
   const rememberLastUrl = useCallback(_.throttle(
     (lastUrl) => {
       localStorage.setItem(LS_KEY_LAST_URL, lastUrl);
@@ -150,6 +149,11 @@ function Form({ classes }) {
     500,
     { leading: false, trailing: true },
   ));
+
+  const transformedValue = useMemo(
+    () => loaderState.raw ? transform(loaderState.raw, loaderState.contentUrl) : '',
+    [loaderState.raw, loaderState.contentUrl],
+  );
 
   async function start() {
     const myTaskId = loaderState.taskId + 1;
@@ -235,7 +239,7 @@ function Form({ classes }) {
         className={classes.textFieldTransformed}
         label="转换后"
         placeholder="这里将显示转换后的文字"
-        value={loaderState.raw ? memoTransform(loaderState.raw, loaderState.contentUrl) : ''}
+        value={transformedValue}
       />
     </Grid>
   );
