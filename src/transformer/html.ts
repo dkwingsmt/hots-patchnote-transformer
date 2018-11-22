@@ -77,13 +77,14 @@ function transformNgaNode(tree: Node): string {
   return generateBbsCode(tree);
 }
 
-export function pageToBbsCode({ htmlText, url }: IPageInfo) {
+export function pageToBbsCode({ htmlText, url }: IPageInfo, { doTranslate }: {doTranslate: boolean}) {
   const tree = standardizeTree(getArticleTree(htmlText));
+  const translatedTree = doTranslate ? translateTree(tree) : tree;
   const sourceStr = url ? `[quote]英文日志：${url}
 [/quote]
 ` : '';
 
   return `[quote]转载请注明本帖来源NGA[s:a2:poi]
 [/quote]
-${sourceStr}${transformNgaNode(translateTree(tree))}`;
+${sourceStr}${transformNgaNode(translatedTree)}`;
 }

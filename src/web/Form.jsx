@@ -22,21 +22,30 @@ import { pageToBbsCode } from '../transformer';
 
 const LS_KEY_LAST_URL = 'hots-patchnote-transform/last-url';
 
-function transform(s, url) {
-  return pageToBbsCode({
-    htmlText: s,
-    url,
-  });
+function transform(s, { url, doTranslate }) {
+  return pageToBbsCode(
+    {
+      htmlText: s,
+      url,
+    },
+    {
+      doTranslate,
+    },
+  );
 }
 
 const jssClasses = {
   optionSection: {
     display: 'flex',
-    justifyContent: 'flex-end',
     margin: 10,
   },
 
+  leftOption: {
+    flex: 1,
+  },
+
   rightOption: {
+    flex: '0 0 auto',
   },
 
   textFieldTransformedInput: {
@@ -137,6 +146,7 @@ async function fetchWithJsonp(url, options) {
 
 function Form({ classes }) {
   const [url, changeUrl] = useState(localStorage.getItem(LS_KEY_LAST_URL) || '');
+  const [doTranslate, changeDoTranslate] = useState(true);
   const [loaderState, loaderDispatch] = useReducer(
     loaderReducer,
     loaderInitState,
@@ -151,8 +161,14 @@ function Form({ classes }) {
   ));
 
   const transformedValue = useMemo(
-    () => loaderState.raw ? transform(loaderState.raw, loaderState.contentUrl) : '',
-    [loaderState.raw, loaderState.contentUrl],
+    () => loaderState.raw ? transform(
+      loaderState.raw,
+      {
+        url: loaderState.contentUrl,
+        doTranslate,
+      },
+    ) : '',
+    [loaderState.raw, loaderState.contentUrl, doTranslate],
   );
 
   async function start() {
@@ -204,6 +220,22 @@ function Form({ classes }) {
         }}
       />
       <div key="options" className={classes.optionSection}>
+        <div className={classes.leftOption}>
+          <FormControl component="fieldset">
+            <FormLabel component="legend">选项</FormLabel>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={doTranslate}
+                  onChange={(evt, checked) => {
+                    changeDoTranslate(!!checked);
+                  }}
+                />
+              }
+              label="翻译"
+            />
+          </FormControl>
+        </div>
         <div className={classes.rightOption}>
           <Button
             variant="contained"

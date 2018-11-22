@@ -77,7 +77,7 @@ async function main() {
   try {
     content = await task;
     // tslint:disable-next-line:no-console
-    console.log(pageToBbsCode(content));
+    console.log(pageToBbsCode(content, { doTranslate: true }));
   } catch (e) {
     console.error(e.stack);
     exit(1);
