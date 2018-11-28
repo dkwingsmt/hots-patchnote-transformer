@@ -673,6 +673,7 @@ export function translateTree(node: Node): Node {
     .replace(' ', ' ')
     .replace('ú', 'u')
     .replace(String.fromCharCode(10), ' ')
+    .replace(String.fromCharCode(160), ' ')
     .replace(String.fromCharCode(8203), ' ');
 
     const result = _.trim(replaced);
