@@ -12,7 +12,8 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 
 import Form from './Form';
-import packageJson from '../../package.json';
+
+const repoUrl = 'https://github.com/dkwingsmt/hots-patchnote-transformer';
 
 const jssClasses = {
 
@@ -56,7 +57,7 @@ function App({ classes }) {
 
           <IconButton
             aria-label="GitHub"
-            href={packageJson.repository.url}
+            href={repoUrl}
             target="_blank"
             rel="noopener noreferrer"
           >

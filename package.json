@@ -6,9 +6,9 @@
   "private": true,
   "main": "build/index.js",
   "scripts": {
-    "build-cli": "tsc",
+    "build-cli": "tsc ./src/cli.ts",
     "transform": "node ./build/src/cli.js",
-    "start": "react-scripts start",
+    "start": "PORT=8000 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
