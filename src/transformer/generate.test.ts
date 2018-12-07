@@ -110,7 +110,7 @@ describe('test genTreeToString', () => {
 });
 
 describe('test generateBbsCode()', () => {
-  test('correctly translate menu', () => {
+  test('correctly translate menu in desired format', () => {
     const htmlNode = <parse5.DefaultTreeDocumentFragment>parse5.parseFragment(
       `<ul>
 	<li><span style="font-size: 14px;"><a href="#heroes">Heroes</a></span></li>
@@ -122,4 +122,12 @@ describe('test generateBbsCode()', () => {
     expect(generateBbsCode(node)).toMatchSnapshot();
   });
 
+  test('correctly translate empty list to empty string', () => {
+    const htmlNode = <parse5.DefaultTreeDocumentFragment>parse5.parseFragment(
+      `<article><ul>
+</ul></article>`,
+    );
+    const node = standardizeTree(htmlNode.childNodes[0]);
+    expect(generateBbsCode(node)).toMatchSnapshot();
+  });
 });

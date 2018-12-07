@@ -1,6 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`test generateBbsCode() correctly translate menu 1`] = `
+exports[`test generateBbsCode() correctly translate empty list to empty string 1`] = `""`;
+
+exports[`test generateBbsCode() correctly translate menu in desired format 1`] = `
 "[list][*]Heroes
 [*]Bug Fixes
 [/list]"

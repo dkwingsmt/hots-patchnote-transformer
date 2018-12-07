@@ -330,16 +330,20 @@ export function genTreeToString(node: GenerationChild): [string, number, number]
     ...node.newlines,
   };
 
-  const [childrenStrReturned, childrenEndNL] = _.reduce<GenerationChild, [string, number]>(
-    node.children,
-    ([prevStr, prevNLAfter]: [string, number], curChild: GenerationChild) => {
-      const isEmptyChild = typeof curChild === 'string' ?
-        !curChild :
-        (!curChild.keepEmpty && (!curChild.children || !curChild.children.length));
-      if (isEmptyChild) {
-        return [prevStr, prevNLAfter];
-      }
+  const filteredChildren: GenerationChild[] = (node.children || []).filter((child: GenerationChild) => {
+    if (typeof child === 'string') {
+      return child;
+    }
 
+    if (child.keepEmpty) {
+      return true;
+    }
+
+    return child.children && child.children.filter(Boolean).length;
+  });
+  const [childrenStrReturned, childrenEndNL] = _.reduce<GenerationChild, [string, number]>(
+    filteredChildren,
+    ([prevStr, prevNLAfter]: [string, number], curChild: GenerationChild) => {
       const [nextStr, nextNLBefore, nextNLAfter] = genTreeToString(curChild);
       const nextNLStr = _.repeat('\n', Math.max(prevNLAfter, nextNLBefore));
 
