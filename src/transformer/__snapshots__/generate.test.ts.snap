@@ -2,6 +2,16 @@
 
 exports[`test generateBbsCode() correctly translate empty list to empty string 1`] = `""`;
 
+exports[`test generateBbsCode() correctly translate header part 1`] = `
+"Our next ... experiences.
+
+======
+
+[size=130%][b]Quick Navigation:[/b][/size]"
+`;
+
+exports[`test generateBbsCode() correctly translate links with spaces 1`] = `"Please stop by the PTR Bug Report forum to let us know."`;
+
 exports[`test generateBbsCode() correctly translate menu in desired format 1`] = `
 "[list][*]Heroes
 [*]Bug Fixes

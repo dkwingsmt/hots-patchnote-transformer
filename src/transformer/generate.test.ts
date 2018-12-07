@@ -2,6 +2,7 @@ import * as parse5 from 'parse5';
 
 import { generateBbsCode, GenerationChild, genTreeToString } from './generate';
 import { standardizeTree } from './html';
+import { collapsedConcat } from './utils';
 
 describe('test genTreeToString', () => {
   test('Test when tag inner NL is longer than children outer NL', () => {
@@ -22,12 +23,8 @@ describe('test genTreeToString', () => {
         },
       ],
     };
-    expect(genTreeToString(node)).toEqual(
-      [
-        '[a]\n\n[b][/b]\n\n[c][/c]\n\n[/a]',
-        0,
-        0,
-      ],
+    expect(collapsedConcat(...genTreeToString(node))).toEqual(
+      '[a]\n\n[b][/b]\n\n[c][/c]\n\n[/a]',
     );
   });
 
@@ -49,12 +46,8 @@ describe('test genTreeToString', () => {
         },
       ],
     };
-    expect(genTreeToString(node)).toEqual(
-      [
-        '[a]\n\n[b][/b]\n\n[c][/c]\n\n[/a]',
-        0,
-        0,
-      ],
+    expect(collapsedConcat(...genTreeToString(node))).toEqual(
+      '[a]\n\n[b][/b]\n\n[c][/c]\n\n[/a]',
     );
   });
 
@@ -73,12 +66,8 @@ describe('test genTreeToString', () => {
         },
       ],
     };
-    expect(genTreeToString(node)).toEqual(
-      [
-        '[a][c]   [/c][/a]',
-        0,
-        0,
-      ],
+    expect(collapsedConcat(...genTreeToString(node))).toEqual(
+      '[a][c]   [/c][/a]',
     );
   });
 
@@ -98,12 +87,8 @@ describe('test genTreeToString', () => {
         },
       ],
     };
-    expect(genTreeToString(node)).toEqual(
-      [
-        '[a]123\n456[/a]',
-        0,
-        0,
-      ],
+    expect(collapsedConcat(...genTreeToString(node))).toEqual(
+      '[a]123\n456[/a]',
     );
   });
 
@@ -122,11 +107,44 @@ describe('test generateBbsCode()', () => {
     expect(generateBbsCode(node)).toMatchSnapshot();
   });
 
+  test('correctly translate menu in desired format (as a child)', () => {
+    const htmlNode = <parse5.DefaultTreeDocumentFragment>parse5.parseFragment(
+      `<div> <ul>
+	<li><span style="font-size: 14px;"><a href="#heroes">Heroes</a></span></li>
+	<li><span style="font-size: 14px;"><a href="#bug-fixes">Bug Fixes</a></span></li>
+</ul> <div>
+`,
+    );
+    const node = standardizeTree(htmlNode.childNodes[0]);
+    expect(generateBbsCode(node)).toMatchSnapshot();
+  });
+
   test('correctly translate empty list to empty string', () => {
     const htmlNode = <parse5.DefaultTreeDocumentFragment>parse5.parseFragment(
       `<article><ul>
-</ul></article>`,
-    );
+  </ul></article>`,
+      );
+    const node = standardizeTree(htmlNode.childNodes[0]);
+    expect(generateBbsCode(node)).toMatchSnapshot();
+  });
+
+  test('correctly translate header part', () => {
+    const htmlNode = <parse5.DefaultTreeDocumentFragment>parse5.parseFragment(
+      `<article><p><span style="font-size:14px;">Our next ... experiences.</span></p>
+
+  <p><a name="return"></a></p>
+
+  <hr class="image-divider">
+  <h3>Quick Navigation:</h3>`,
+      );
+    const node = standardizeTree(htmlNode.childNodes[0]);
+    expect(generateBbsCode(node)).toMatchSnapshot();
+  });
+
+  test.skip('correctly translate links with spaces', () => {
+    const htmlNode = <parse5.DefaultTreeDocumentFragment>parse5.parseFragment(
+      `<span>Please stop by the <a href="https://us.forums.blizzard.com">PTR Bug Report forum</a> to let us know.</span>`,
+      );
     const node = standardizeTree(htmlNode.childNodes[0]);
     expect(generateBbsCode(node)).toMatchSnapshot();
   });

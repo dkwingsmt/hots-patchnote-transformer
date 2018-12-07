@@ -2,6 +2,7 @@ import _ from 'lodash';
 
 import { findNearestColor } from './color';
 import { Attribute, Node } from './const';
+import { collapsedConcat, nl } from './utils';
 
 function parseStyle(node: Node): Record<string, string> {
   if (node.kind === 'text') {
@@ -78,8 +79,10 @@ interface IGenerationNode {
 
 export type GenerationChild = IGenerationNode | string;
 
+// Convert HTML tree to GenerationTree, which includes indication to stringify the node tree.
+// In terms of implementation, this function does not remove empty nodes, but handles trimming.
 // tslint:disable-next-line:max-func-body-length cyclomatic-complexity
-function bbsTreeToGenerationTree(node: Node): GenerationChild {
+export function bbsTreeToGenerationTree(node: Node): GenerationChild {
   if (node.kind === 'text') {
     return _.trim(node.text);
   }
@@ -91,9 +94,10 @@ function bbsTreeToGenerationTree(node: Node): GenerationChild {
 
   const style = parseStyle(node);
   let children = node.children.map(bbsTreeToGenerationTree);
-  // <picture>: pick only the first child
+  // <picture>: pick only the first node child
   if (node.tag === 'picture') {
-    children = children.slice(0, 1);
+    const firstNode = _.find(children, (child: GenerationChild) => typeof child !== 'string');
+    children = firstNode ? [firstNode] : [];
   }
 
   // Wrap children with styles
@@ -119,8 +123,8 @@ function bbsTreeToGenerationTree(node: Node): GenerationChild {
       children: ['======'],
       keepEmpty: true,
       newlines: {
-        outBefore: 1,
-        outAfter: 1,
+        outBefore: 2,
+        outAfter: 2,
       },
     };
   case 'figure':
@@ -196,7 +200,7 @@ function bbsTreeToGenerationTree(node: Node): GenerationChild {
         children,
       }],
       newlines: {
-        outBefore: 2,
+        outBefore: 1,
         outAfter: 1,
       },
     };
@@ -206,7 +210,7 @@ function bbsTreeToGenerationTree(node: Node): GenerationChild {
     return {
       children,
       newlines: {
-        outBefore: 1,
+        outSum: 1,
       },
     };
   case 'strong':
@@ -258,6 +262,7 @@ function bbsTreeToGenerationTree(node: Node): GenerationChild {
       newlines: {
         outBefore: 1,
         inEnd: 1,
+        outAfter: 1,
       },
     };
   }
@@ -268,8 +273,8 @@ function bbsTreeToGenerationTree(node: Node): GenerationChild {
       tagSuffix: '=1',
       newlines: {
         outBefore: 1,
-        outAfter: 1,
         inEnd: 1,
+        outAfter: 1,
       },
     };
   }
@@ -317,9 +322,12 @@ function bbsTreeToGenerationTree(node: Node): GenerationChild {
   }
 }
 
-export function genTreeToString(node: GenerationChild): [string, number, number] {
+// genTreeToString recursively convert a GenerationChild to BbsCode.
+// Returns [prefix, body, suffix], where prefix and suffix contains in-newlines, out-newlines and tags.
+// In terms of implementation, this function does not handle trimming, but removes empty nodes.
+export function genTreeToString(node: GenerationChild): [string, string, string] {
   if (typeof node === 'string') {
-    return [node, 0, 0];
+    return ['', node, ''];  // Should I trim the string and put NLs into prefix and suffix?
   }
   const nodeNewlines = {
     inStart: 0,
@@ -330,49 +338,50 @@ export function genTreeToString(node: GenerationChild): [string, number, number]
     ...node.newlines,
   };
 
-  const filteredChildren: GenerationChild[] = (node.children || []).filter((child: GenerationChild) => {
-    if (typeof child === 'string') {
-      return child;
-    }
+  // const filteredChildren: GenerationChild[] = (node.children || []).filter((child: GenerationChild) => {
+  //   if (typeof child === 'string') {
+  //     return child;
+  //   }
 
-    if (child.keepEmpty) {
-      return true;
-    }
+  //   if (child.keepEmpty) {
+  //     return true;
+  //   }
 
-    return child.children && child.children.filter(Boolean).length;
-  });
-  const [childrenStrReturned, childrenEndNL] = _.reduce<GenerationChild, [string, number]>(
-    filteredChildren,
-    ([prevStr, prevNLAfter]: [string, number], curChild: GenerationChild) => {
-      const [nextStr, nextNLBefore, nextNLAfter] = genTreeToString(curChild);
-      const nextNLStr = _.repeat('\n', Math.max(prevNLAfter, nextNLBefore));
+  //   return child.children && child.children.filter(Boolean).length;
+  // });
+
+  const [childrenStrReturned, childrenEndNL] = _.reduce<GenerationChild, [string, string]>(
+    node.children,
+    ([prevStr, prevNLAfter]: [string, string], curChild: GenerationChild) => {
+      const [nextNLBefore, nextStr, nextNLAfter] = genTreeToString(curChild);
+      if (!nextStr && (typeof curChild === 'string' || !curChild.keepEmpty)) {
+        return [prevStr, prevNLAfter];
+      }
 
       return [
-        `${prevStr}${nextNLStr}${nextStr}`,
+        collapsedConcat(prevStr, prevNLAfter, nextNLBefore, nextStr),
         nextNLAfter,
       ];
     },
-    ['', nodeNewlines.inStart],
+    ['', ''],
   );
-  const childrenEndNLStr = _.repeat('\n', Math.max(childrenEndNL, nodeNewlines.inEnd));
-  const childrenStr = `${childrenStrReturned}${childrenEndNLStr}`;
+  const nodeBodyStr = collapsedConcat(childrenStrReturned, childrenEndNL);
 
   const tagSuffix = node.tagSuffix || '';
   const startTag = node.tag ? `[${node.tag}${tagSuffix}]` : '';
   const endTag = node.tag ? `[/${node.tag}]` : '';
-  const realChildrenStr = `${startTag}${childrenStr}${endTag}`;
-
-  const outAfterFromSum = nodeNewlines.outSum - nodeNewlines.outBefore;
+  const outBeforeNL = nodeNewlines.outBefore;
+  const outAfterNL = Math.max(nodeNewlines.outSum - nodeNewlines.outBefore, nodeNewlines.outAfter);
 
   return [
-    realChildrenStr,
-    nodeNewlines.outBefore,
-    Math.max(outAfterFromSum, nodeNewlines.outAfter),
+    `${nl(outBeforeNL)}${startTag}${nl(nodeNewlines.inStart)}`,
+    nodeBodyStr,
+    `${nl(nodeNewlines.inEnd)}${endTag}${nl(outAfterNL)}`,
   ];
 }
 
 export function generateBbsCode(node: Node): string {
   const genTree = bbsTreeToGenerationTree(node);
 
-  return genTreeToString(genTree)[0];
+  return _.trim(collapsedConcat(...genTreeToString(genTree)));
 }
