@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`test generateBbsCode() correctly translate menu 1`] = `
+"[list][*]Heroes
+[*]Bug Fixes
+[/list]"
+`;

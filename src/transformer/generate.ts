@@ -42,21 +42,27 @@ function getNumAttr(node: Node, attr: string) {
   return attrObj.value;
 }
 
-function trimNewlines(str: string): [string, number, number] {
-  const trimmedLeft = _.trimStart(str, '\n');
-  const left = str.length - trimmedLeft.length;
-  const trimmedRight = _.trimEnd(trimmedLeft, '\n');
-  const right = trimmedLeft.length - trimmedRight.length;
+/* INewlines defines at least how many new lines are required at each position.
 
-  return [trimmedRight, left, right];
-}
+     1        2                 3                 4         5
+     v        v                 v                 v         v
+      [parent] [child1][/child1] [child2][/child2] [/parent]
 
+ Each position above is controlled by properties as below:
+1: parent.outBefore
+2: max(parent.inStart, child1.outBefore)
+3: max(child1.outAfter, child2.outBefore)
+4: max(child2.outAfter, parent.inEnd)
+5: parent.outAfter
+
+outSum regulates outAfter, making it at least (outSum - outBefore). It is only used by <br />.
+*/
 interface INewlines {
   inStart?: number;
   inEnd?: number;
   outBefore?: number;
   outAfter?: number;
-  outBoth?: number;
+  outSum?: number;
 }
 
 interface IGenerationNode {
@@ -64,10 +70,13 @@ interface IGenerationNode {
   tagSuffix?: string;
   children?: (IGenerationNode | string)[];
   newlines?: INewlines;
-  alwaysKeep?: boolean;
+  // By default empty nodes are removed, including #text that is empty after trimming,
+  // or parent nodes that have 0 children. Removed nodes will have nothing output,
+  // including its tags. `keepEmpty` will force keeping the tags of an empty parent node.
+  keepEmpty?: boolean;
 }
 
-type GenerationChild = IGenerationNode | string;
+export type GenerationChild = IGenerationNode | string;
 
 // tslint:disable-next-line:max-func-body-length cyclomatic-complexity
 function bbsTreeToGenerationTree(node: Node): GenerationChild {
@@ -100,18 +109,18 @@ function bbsTreeToGenerationTree(node: Node): GenerationChild {
   switch (node.tag) {
   case 'br':
     return {
+      keepEmpty: true,
       newlines: {
-        outBoth: 1,
-        alwaysKeep: true,
+        outSum: 1,
       },
     };
   case 'hr':
     return {
       children: ['======'],
+      keepEmpty: true,
       newlines: {
         outBefore: 1,
         outAfter: 1,
-        alwaysKeep: true,
       },
     };
   case 'figure':
@@ -159,11 +168,11 @@ function bbsTreeToGenerationTree(node: Node): GenerationChild {
       tag: 'td',
       tagSuffix: `${rowspanStr}${colspanStr}`,
       children,
+      keepEmpty: true,
       newlines: {
         outBefore: 1,
         outAfter: 1,
       },
-      alwaysKeep: true,
     };
   }
   case 'h1':
@@ -248,7 +257,6 @@ function bbsTreeToGenerationTree(node: Node): GenerationChild {
       tag: 'list',
       newlines: {
         outBefore: 1,
-        outAfter: 1,
         inEnd: 1,
       },
     };
@@ -269,7 +277,6 @@ function bbsTreeToGenerationTree(node: Node): GenerationChild {
     return {
       children: [<GenerationChild>'[*]'].concat(children),
       newlines: {
-        outBefore: 1,
         outAfter: 1,
       },
     };
@@ -310,14 +317,29 @@ function bbsTreeToGenerationTree(node: Node): GenerationChild {
   }
 }
 
-function genTreeToString(node: GenerationChild): [string, number, number] {
+export function genTreeToString(node: GenerationChild): [string, number, number] {
   if (typeof node === 'string') {
     return [node, 0, 0];
   }
+  const nodeNewlines = {
+    inStart: 0,
+    inEnd: 0,
+    outBefore: 0,
+    outAfter: 0,
+    outSum: 0,
+    ...node.newlines,
+  };
 
   const [childrenStrReturned, childrenEndNL] = _.reduce<GenerationChild, [string, number]>(
     node.children,
     ([prevStr, prevNLAfter]: [string, number], curChild: GenerationChild) => {
+      const isEmptyChild = typeof curChild === 'string' ?
+        !curChild :
+        (!curChild.keepEmpty && (!curChild.children || !curChild.children.length));
+      if (isEmptyChild) {
+        return [prevStr, prevNLAfter];
+      }
+
       const [nextStr, nextNLBefore, nextNLAfter] = genTreeToString(curChild);
       const nextNLStr = _.repeat('\n', Math.max(prevNLAfter, nextNLBefore));
 
@@ -326,25 +348,22 @@ function genTreeToString(node: GenerationChild): [string, number, number] {
         nextNLAfter,
       ];
     },
-    ['', (node.newlines || {}).inStart || 0],
+    ['', nodeNewlines.inStart],
   );
-  const childrenEndNLStr = _.repeat('\n', Math.max(childrenEndNL, (node.newlines || {}).inEnd || 0));
+  const childrenEndNLStr = _.repeat('\n', Math.max(childrenEndNL, nodeNewlines.inEnd));
   const childrenStr = `${childrenStrReturned}${childrenEndNLStr}`;
 
-  let realChildrenStr;
-  if (!node.alwaysKeep && !_.trim(childrenStr)) {
-    realChildrenStr = '';
-  } else {
-    const tagSuffix = node.tagSuffix || '';
-    const startTag = node.tag ? `[${node.tag}${tagSuffix}]` : '';
-    const endTag = node.tag ? `[/${node.tag}]` : '';
-    realChildrenStr = `${startTag}${childrenStr}${endTag}`;
-  }
+  const tagSuffix = node.tagSuffix || '';
+  const startTag = node.tag ? `[${node.tag}${tagSuffix}]` : '';
+  const endTag = node.tag ? `[/${node.tag}]` : '';
+  const realChildrenStr = `${startTag}${childrenStr}${endTag}`;
+
+  const outAfterFromSum = nodeNewlines.outSum - nodeNewlines.outBefore;
 
   return [
     realChildrenStr,
-    (node.newlines || {}).outBefore || 0,
-    (node.newlines || {}).outAfter || 0,
+    nodeNewlines.outBefore,
+    Math.max(outAfterFromSum, nodeNewlines.outAfter),
   ];
 }
 
