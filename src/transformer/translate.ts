@@ -550,7 +550,6 @@ function translateUnit(origin: string): string {
   }
 
   const plural = pluralize(origin);
-  console.log(origin, plural);
   const dict: Record<string, string> = {
     seconds: '秒',
   };

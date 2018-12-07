@@ -6,19 +6,15 @@ import keycode from 'keycode';
 import jsonp from 'jsonp';
 
 import { Button } from '@material-ui/core';
-import AppBar from '@material-ui/core/AppBar';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
 import Grid from '@material-ui/core/Grid';
-import IconButton from '@material-ui/core/IconButton';
 import { withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
 
-import { pageToBbsCode } from '../transformer';
+import { pageToBbsCode } from '../transformer/index.ts';
 
 const LS_KEY_LAST_URL = 'hots-patchnote-transform/last-url';
 
