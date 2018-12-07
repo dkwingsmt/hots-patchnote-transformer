@@ -1,0 +1,53 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`test standardizeTree() result must match 1`] = `
+Object {
+  "attrs": Array [
+    Object {
+      "name": "style",
+      "value": "1",
+    },
+    Object {
+      "name": "disabled",
+      "value": "1",
+    },
+  ],
+  "children": Array [
+    Object {
+      "kind": "text",
+      "text": " ",
+    },
+    Object {
+      "attrs": Array [],
+      "children": Array [
+        Object {
+          "kind": "text",
+          "text": " 123 ",
+        },
+        Object {
+          "attrs": Array [],
+          "children": Array [
+            Object {
+              "attrs": Array [],
+              "children": Array [
+                Object {
+                  "kind": "text",
+                  "text": "hey",
+                },
+              ],
+              "kind": "parent",
+              "tag": "u",
+            },
+          ],
+          "kind": "parent",
+          "tag": "em",
+        },
+      ],
+      "kind": "parent",
+      "tag": "i",
+    },
+  ],
+  "kind": "parent",
+  "tag": "b",
+}
+`;
