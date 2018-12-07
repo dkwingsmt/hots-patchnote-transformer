@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 
+import pluralize from 'pluralize';
 import i18nDict from '../external/i18n';
 import { Node } from './const';
 import { toI18nKey } from './utils';
@@ -554,19 +555,6 @@ function translateUnit(origin: string): string {
   };
 
   return dict[plural] || origin || '';
-}
-
-function pluralize(origin: string): string {
-  let plural = origin;
-  if (!origin.endsWith('s')) {
-    if (origin.endsWith('e')) {
-      plural += 's';
-    } else {
-      plural += 'es';
-    }
-  }
-
-  return plural;
 }
 
 function translatePer(origin: string): [string, string] {

@@ -2,6 +2,7 @@ import _ from 'lodash';
 
 import { findNearestColor } from './color';
 import { Attribute, Node } from './const';
+import { collapsedConcat, nl } from './utils';
 
 function parseStyle(node: Node): Record<string, string> {
   if (node.kind === 'text') {
@@ -42,57 +43,123 @@ function getNumAttr(node: Node, attr: string) {
   return attrObj.value;
 }
 
-function trimNewlines(str: string): [string, number, number] {
-  const trimmedLeft = _.trimStart(str, '\n');
-  const left = str.length - trimmedLeft.length;
-  const trimmedRight = _.trimEnd(trimmedLeft, '\n');
-  const right = trimmedLeft.length - trimmedRight.length;
+/* INewlines defines at least how many new lines are required at each position.
 
-  return [trimmedRight, left, right];
+     1        2                 3                 4         5
+     v        v                 v                 v         v
+      [parent] [child1][/child1] [child2][/child2] [/parent]
+
+ Each position above is controlled by properties as below:
+1: parent.outBefore
+2: max(parent.inStart, child1.outBefore)
+3: max(child1.outAfter, child2.outBefore)
+4: max(child2.outAfter, parent.inEnd)
+5: parent.outAfter
+
+outSum regulates outAfter, making it at least (outSum - outBefore). It is only used by <br />.
+*/
+interface INewlines {
+  inStart?: number;
+  inEnd?: number;
+  outBefore?: number;
+  outAfter?: number;
+  outSum?: number;
 }
 
-function ensureNewlines(nodeText: string, startNum: number, endNum: number = 0) {
-  const [trimmed, left, right] = trimNewlines(nodeText);
-
-  return _.repeat('\n', Math.max(startNum, left)) + trimmed + _.repeat('\n', Math.max(endNum, right));
+interface IGenerationNode {
+  tag?: string;
+  tagSuffix?: string;
+  children?: (IGenerationNode | string)[];
+  newlines?: INewlines;
+  // By default empty nodes are removed, including #text that is empty after trimming,
+  // or parent nodes that have 0 children. Removed nodes will have nothing output,
+  // including its tags. `keepEmpty` will force keeping the tags of an empty parent node.
+  keepEmpty?: boolean;
 }
 
+export type GenerationChild = IGenerationNode | string;
+
+// Convert HTML tree to GenerationTree, which includes indication to stringify the node tree.
+// In terms of implementation, this function does not remove empty nodes, but handles trimming.
 // tslint:disable-next-line:max-func-body-length cyclomatic-complexity
-export function generateBbsCode(node: Node, context: Record<string, unknown> = {}) {
+export function bbsTreeToGenerationTree(node: Node): GenerationChild {
   if (node.kind === 'text') {
-    return node.text;
+    return _.trim(node.text);
   }
-  // <picture>: pick only the first child
-  if (node.tag === 'picture') {
-    node.children = node.children.slice(0, 1);
-  }
+
   // Node types to skip
   if (_.includes(['style', 'script', '#comment'], node.tag)) {
     return '';
   }
+
   const style = parseStyle(node);
-  const childrenRaw = generateBbsNodeList(node.children);
-  let children = childrenRaw;
+  let children = node.children.map(bbsTreeToGenerationTree);
+  // <picture>: pick only the first node child
+  if (node.tag === 'picture') {
+    const firstNode = _.find(children, (child: GenerationChild) => typeof child !== 'string');
+    children = firstNode ? [firstNode] : [];
+  }
+
+  // Wrap children with styles
   if (style.color) {
     const ngaColor = findNearestColor(style.color);
-    if (ngaColor) {
-      children = `[color=${ngaColor}]${children}[/color]`;
-    }
+    children = [{
+      tag: 'color',
+      tagSuffix: `=${ngaColor}`,
+      children,
+    }];
   }
+
   switch (node.tag) {
   case 'br':
-    return '\n';
+    return {
+      keepEmpty: true,
+      newlines: {
+        outSum: 1,
+      },
+    };
   case 'hr':
-    return '\n======\n';
+    return {
+      children: ['======'],
+      keepEmpty: true,
+      newlines: {
+        outBefore: 2,
+        outAfter: 2,
+      },
+    };
   case 'figure':
-    return `\n${children}\n`;
+    return {
+      children,
+      newlines: {
+        outBefore: 1,
+        outAfter: 1,
+      },
+    };
   case 'table':
-    return `\n[${node.tag}]${children}\n[/${node.tag}]\n`;
+    return {
+      tag: node.tag,
+      children,
+      newlines: {
+        outBefore: 1,
+        outAfter: 1,
+        inEnd: 1,
+      },
+    };
   case 'tbody':
   case 'thead':
-    return children;
+    return {
+      children,
+    };
   case 'tr':
-    return `\n[${node.tag}]${children}\n[/${node.tag}]`;
+    return {
+      tag: 'tr',
+      children,
+      newlines: {
+        outBefore: 1,
+        outAfter: 1,
+        inEnd: 1,
+      },
+    };
   case 'th':
   case 'td': {
     const colspan = getNumAttr(node, 'colspan');
@@ -101,7 +168,16 @@ export function generateBbsCode(node: Node, context: Record<string, unknown> = {
     const rowspanStr = rowspan ? ` rowspan=${rowspan}` : '';
     // const boldChildren = node.tag === 'th' ? `[b]${children}[/b]` : children;
 
-    return `\n[td${rowspanStr}${colspanStr}]${children}[/td]`;
+    return {
+      tag: 'td',
+      tagSuffix: `${rowspanStr}${colspanStr}`,
+      children,
+      keepEmpty: true,
+      newlines: {
+        outBefore: 1,
+        outAfter: 1,
+      },
+    };
   }
   case 'h1':
   case 'h2':
@@ -116,86 +192,196 @@ export function generateBbsCode(node: Node, context: Record<string, unknown> = {
       h5: 110,
     };
 
-    return children ? `\n[size=${sizes[node.tag]}%][b]${children}[/b][/size]\n` : '';
+    return {
+      tag: 'size',
+      tagSuffix: `=${sizes[node.tag]}%`,
+      children: [{
+        tag: 'b',
+        children,
+      }],
+      newlines: {
+        outBefore: 1,
+        outAfter: 1,
+      },
+    };
   }
-
-  case 'picture':
-  case 'span':
-  case 'a':
-  case 'div':
-  case 'font':
-    return children;
 
   case 'p':
-    return children ? ensureNewlines(children, 1) : '';
+    return {
+      children,
+      newlines: {
+        outSum: 1,
+      },
+    };
   case 'strong':
   case 'b':
-    return children ? `[b]${children}[/b]` : '';
+    return {
+      children,
+      tag: 'b',
+    };
   case 's':
-    return children ? `[del]${children}[/del]` : '';
+    return {
+      children,
+      tag: 'del',
+    };
   case 'u':
-    return children ? `[u]${children}[/u]` : '';
+    return {
+      children,
+      tag: 'u',
+    };
   case 'em':
   case 'i':
-    return `[i]${children}[/i]`;
+    return {
+      children,
+      tag: 'i',
+    };
   case 'sup':
-    return `[sup]${children}[/sup]`;
+    return {
+      children,
+      tag: 'sup',
+    };
   case 'sub':
-    return `[sub]${children}[/sub]`;
+    return {
+      children,
+      tag: 'sub',
+    };
   case 'blockquote':
-    return `\n[quote]${ensureNewlines(children, 1, 1)}[/quote]`;
-  case 'article':
-    return children;
+    return {
+      children,
+      tag: 'quote',
+      newlines: {
+        outBefore: 1,
+        outAfter: 1,
+        inEnd: 1,
+      },
+    };
   case 'ul': {
-    const prefix = context.$prev ? '' : '\n';
-
-    return `\n${prefix}[list]${ensureNewlines(children, 0, 1)}[/list]\n`;
+    return {
+      children,
+      tag: 'list',
+      newlines: {
+        outBefore: 1,
+        inEnd: 1,
+        outAfter: 1,
+      },
+    };
   }
   case 'ol': {
-    const prefix = context.$prev ? '' : '\n';
-
-    return `\n${prefix}[list=1]${ensureNewlines(children, 0, 1)}[/list]\n`;
+    return {
+      children,
+      tag: 'list',
+      tagSuffix: '=1',
+      newlines: {
+        outBefore: 1,
+        inEnd: 1,
+        outAfter: 1,
+      },
+    };
   }
   case 'li': {
-    const prefix = context.$prev ? '\n' : '';
-
-    return `${prefix}[*]${children}`;
+    return {
+      children: [<GenerationChild>'[*]'].concat(children),
+      newlines: {
+        outAfter: 1,
+      },
+    };
   }
 
   case 'img': {
     const src = findAttr(node, 'src');
     if (src) {
-      return `\n[img]${src.value}[/img]\n`;
+      return {
+        children: [src.value],
+        tag: 'img',
+        newlines: {
+          outBefore: 1,
+          outAfter: 1,
+        },
+      };
     }
 
     return '';
   }
 
+  case 'article':
+  case 'picture':
+  case 'span':
+  case 'a':
+  case 'div':
+  case 'font':
+    return {
+      children,
+    };
+
   default:
     console.warn(`Unhandled node type ${node.tag}`);
 
-    return children;
+    return {
+      children,
+    };
   }
 }
 
-function generateBbsNodeList(nodes: Node[]) {
-  let result = '';
-  let prevNode: Node;
-  let prevNewlines = 0;
-  _.forEach(nodes, (node: Node) => {
-    const nodeText = generateBbsCode(node, { $prev: prevNode });
-    if (nodeText.length !== 0) {
-      prevNode = node;
-      const [trimmedNodeText, leftNewlines, rightNewlines] = trimNewlines(nodeText);
-      // console.log('trimmed', prevNewlines, leftNewlines, rightNewlines);
-      result += _.repeat('\n', Math.max(prevNewlines, leftNewlines));
-      result += trimmedNodeText;
-      prevNewlines = rightNewlines;
-    } else if (prevNode && prevNode.kind !== 'text') {
-      result += ' ';
-    }
-  });
+// genTreeToString recursively convert a GenerationChild to BbsCode.
+// Returns [prefix, body, suffix], where prefix and suffix contains in-newlines, out-newlines and tags.
+// In terms of implementation, this function does not handle trimming, but removes empty nodes.
+export function genTreeToString(node: GenerationChild): [string, string, string] {
+  if (typeof node === 'string') {
+    return ['', node, ''];  // Should I trim the string and put NLs into prefix and suffix?
+  }
+  const nodeNewlines = {
+    inStart: 0,
+    inEnd: 0,
+    outBefore: 0,
+    outAfter: 0,
+    outSum: 0,
+    ...node.newlines,
+  };
 
-  return (result + _.repeat('\n', prevNewlines))
-    .replace(/ *\n/g, '\n');
+  // const filteredChildren: GenerationChild[] = (node.children || []).filter((child: GenerationChild) => {
+  //   if (typeof child === 'string') {
+  //     return child;
+  //   }
+
+  //   if (child.keepEmpty) {
+  //     return true;
+  //   }
+
+  //   return child.children && child.children.filter(Boolean).length;
+  // });
+
+  const [childrenStrReturned, childrenEndNL] = _.reduce<GenerationChild, [string, string]>(
+    node.children,
+    ([prevStr, prevNLAfter]: [string, string], curChild: GenerationChild) => {
+      const [nextNLBefore, nextStr, nextNLAfter] = genTreeToString(curChild);
+      if (!nextStr && (typeof curChild === 'string' || !curChild.keepEmpty)) {
+        return [prevStr, prevNLAfter];
+      }
+
+      return [
+        collapsedConcat(prevStr, prevNLAfter, nextNLBefore, nextStr),
+        nextNLAfter,
+      ];
+    },
+    ['', ''],
+  );
+  const nodeBodyStr = collapsedConcat(childrenStrReturned, childrenEndNL);
+
+  const tagSuffix = node.tagSuffix || '';
+  const startTag = node.tag ? `[${node.tag}${tagSuffix}]` : '';
+  const endTag = node.tag ? `[/${node.tag}]` : '';
+  const outBeforeNL = nodeNewlines.outBefore;
+  const outAfterNL = Math.max(nodeNewlines.outSum - nodeNewlines.outBefore, nodeNewlines.outAfter);
+
+  return [
+    `${nl(outBeforeNL)}${startTag}${nl(nodeNewlines.inStart)}`,
+    nodeBodyStr,
+    `${nl(nodeNewlines.inEnd)}${endTag}${nl(outAfterNL)}`,
+  ];
+}
+
+export function generateBbsCode(node: Node): string {
+  const genTree = bbsTreeToGenerationTree(node);
+
+  return _.trim(collapsedConcat(...genTreeToString(genTree)));
 }
