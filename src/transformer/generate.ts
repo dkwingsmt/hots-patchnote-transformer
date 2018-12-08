@@ -215,6 +215,12 @@ export function bbsTreeToGenerationTree(node: Node): GenerationChild {
     };
   case 'strong':
   case 'b':
+    // https://github.com/dkwingsmt/hots-patchnote-transformer/issues/1
+    if (children.length == 1 && children[0].toString() == 'Lt.') {
+      return '';
+    } else if (children.length == 1 && children[0] == 'Morales：') {
+      children[0] = '莫拉莉斯中尉：';
+    }
     return {
       children,
       tag: 'b',
