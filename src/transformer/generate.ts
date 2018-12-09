@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import lodash from 'lodash';
 
 import { findNearestColor } from './color';
 import { Attribute, Node } from './const';
@@ -216,9 +216,9 @@ export function bbsTreeToGenerationTree(node: Node): GenerationChild {
   case 'strong':
   case 'b':
     // https://github.com/dkwingsmt/hots-patchnote-transformer/issues/1
-    if (children.length == 1 && children[0].toString() == 'Lt.') {
+    if (children.length === 1 && children[0].toString() === 'Lt.') {
       return '';
-    } else if (children.length == 1 && children[0] == 'Morales：') {
+    } else if (children.length === 1 && children[0] === 'Morales：') {
       children[0] = '莫拉莉斯中尉：';
     }
     return {
@@ -312,13 +312,26 @@ export function bbsTreeToGenerationTree(node: Node): GenerationChild {
   case 'article':
   case 'picture':
   case 'span':
-  case 'a':
   case 'div':
   case 'font':
     return {
       children,
     };
 
+  case 'a':
+    const href = findAttr(node, 'href');
+    // #xxx is just anchor so no need for special handling
+    if (href && href.value.indexOf('#') !== 0) {
+      return {
+        children,
+        tag: 'url',
+        tagSuffix: '=' + href.value,
+      };
+    }
+
+    return {
+      children,
+    };
   default:
     console.warn(`Unhandled node type ${node.tag}`);
 
