@@ -141,7 +141,7 @@ describe('test generateBbsCode()', () => {
     expect(generateBbsCode(node)).toMatchSnapshot();
   });
 
-  test.skip('correctly translate links with spaces', () => {
+  test('correctly translate links with spaces', () => {
     const htmlNode = <parse5.DefaultTreeDocumentFragment>parse5.parseFragment(
       `<span>Please stop by the <a href="https://us.forums.blizzard.com">PTR Bug Report forum</a> to let us know.</span>`,
       );

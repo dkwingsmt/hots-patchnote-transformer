@@ -12,7 +12,7 @@ exports[`test generateBbsCode() correctly translate header part 1`] = `
 
 exports[`test generateBbsCode() correctly translate hero name for Lt. Morales 1`] = `"[b]莫拉莉斯中尉：[/b]"`;
 
-exports[`test generateBbsCode() correctly translate links with spaces 1`] = `"Please stop by the PTR Bug Report forum to let us know."`;
+exports[`test generateBbsCode() correctly translate links with spaces 1`] = `"Please stop by the[url=https://us.forums.blizzard.com]PTR Bug Report forum[/url]to let us know."`;
 
 exports[`test generateBbsCode() correctly translate menu in desired format (as a child) 1`] = `
 "[list][*]Heroes
