@@ -23,8 +23,8 @@ describe('test genTreeToString', () => {
         },
       ],
     };
-    expect(collapsedConcat(...genTreeToString(node))).toEqual(
-      '[a]\n\n[b][/b]\n\n[c][/c]\n\n[/a]',
+    expect(collapsedConcat(...genTreeToString(node)))
+      .toEqual('[a]\n\n[b][/b]\n\n[c][/c]\n\n[/a]',
     );
   });
 
@@ -46,8 +46,8 @@ describe('test genTreeToString', () => {
         },
       ],
     };
-    expect(collapsedConcat(...genTreeToString(node))).toEqual(
-      '[a]\n\n[b][/b]\n\n[c][/c]\n\n[/a]',
+    expect(collapsedConcat(...genTreeToString(node)))
+      .toEqual('[a]\n\n[b][/b]\n\n[c][/c]\n\n[/a]',
     );
   });
 
@@ -66,8 +66,8 @@ describe('test genTreeToString', () => {
         },
       ],
     };
-    expect(collapsedConcat(...genTreeToString(node))).toEqual(
-      '[a][c]   [/c][/a]',
+    expect(collapsedConcat(...genTreeToString(node)))
+      .toEqual('[a][c]   [/c][/a]',
     );
   });
 
@@ -87,8 +87,8 @@ describe('test genTreeToString', () => {
         },
       ],
     };
-    expect(collapsedConcat(...genTreeToString(node))).toEqual(
-      '[a]123\n456[/a]',
+    expect(collapsedConcat(...genTreeToString(node)))
+      .toEqual('[a]123\n456[/a]',
     );
   });
 
@@ -98,13 +98,14 @@ describe('test generateBbsCode()', () => {
   test('correctly translate menu in desired format', () => {
     const htmlNode = <parse5.DefaultTreeDocumentFragment>parse5.parseFragment(
       `<ul>
-	<li><span style="font-size: 14px;"><a href="#heroes">Heroes</a></span></li>
-	<li><span style="font-size: 14px;"><a href="#bug-fixes">Bug Fixes</a></span></li>
+  <li><span style="font-size: 14px;"><a href="#heroes">Heroes</a></span></li>
+  <li><span style="font-size: 14px;"><a href="#bug-fixes">Bug Fixes</a></span></li>
 </ul>
 `,
     );
     const node = standardizeTree(htmlNode.childNodes[0]);
-    expect(generateBbsCode(node)).toMatchSnapshot();
+    expect(generateBbsCode(node))
+      .toMatchSnapshot();
   });
 
   test('correctly translate menu in desired format (as a child)', () => {
@@ -116,7 +117,8 @@ describe('test generateBbsCode()', () => {
 `,
     );
     const node = standardizeTree(htmlNode.childNodes[0]);
-    expect(generateBbsCode(node)).toMatchSnapshot();
+    expect(generateBbsCode(node))
+      .toMatchSnapshot();
   });
 
   test('correctly translate empty list to empty string', () => {
@@ -125,7 +127,8 @@ describe('test generateBbsCode()', () => {
   </ul></article>`,
       );
     const node = standardizeTree(htmlNode.childNodes[0]);
-    expect(generateBbsCode(node)).toMatchSnapshot();
+    expect(generateBbsCode(node))
+      .toMatchSnapshot();
   });
 
   test('correctly translate header part', () => {
@@ -138,7 +141,8 @@ describe('test generateBbsCode()', () => {
   <h3>Quick Navigation:</h3>`,
       );
     const node = standardizeTree(htmlNode.childNodes[0]);
-    expect(generateBbsCode(node)).toMatchSnapshot();
+    expect(generateBbsCode(node))
+      .toMatchSnapshot();
   });
 
   test('correctly translate links with spaces', () => {
@@ -146,16 +150,18 @@ describe('test generateBbsCode()', () => {
       `<span>Please stop by the <a href="https://us.forums.blizzard.com">PTR Bug Report forum</a> to let us know.</span>`,
       );
     const node = standardizeTree(htmlNode.childNodes[0]);
-    expect(generateBbsCode(node)).toMatchSnapshot();
+    expect(generateBbsCode(node))
+      .toMatchSnapshot();
   });
 
   test('correctly translate hero name for Lt. Morales', () => {
     const htmlNode = <parse5.DefaultTreeDocumentFragment>parse5.parseFragment(
       `<span style="font-size:14px;">
-      <strong>Lt.</strong> <strong>Morales：</strong> 
+      <strong>Lt.</strong> <strong>Morales：</strong>
       </span>`,
       );
     const node = standardizeTree(htmlNode.childNodes[0]);
-    expect(generateBbsCode(node)).toMatchSnapshot();
+    expect(generateBbsCode(node))
+      .toMatchSnapshot();
   });
 });
