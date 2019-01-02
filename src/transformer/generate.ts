@@ -1,4 +1,4 @@
-import lodash from 'lodash';
+import _ from 'lodash';
 
 import { findNearestColor } from './color';
 import { Attribute, Node } from './const';
@@ -218,9 +218,11 @@ export function bbsTreeToGenerationTree(node: Node): GenerationChild {
     // https://github.com/dkwingsmt/hots-patchnote-transformer/issues/1
     if (children.length === 1 && children[0].toString() === 'Lt.') {
       return '';
-    } else if (children.length === 1 && children[0] === 'Morales：') {
+    }
+    if (children.length === 1 && children[0] === 'Morales：') {
       children[0] = '莫拉莉斯中尉：';
     }
+
     return {
       children,
       tag: 'b',
@@ -325,7 +327,7 @@ export function bbsTreeToGenerationTree(node: Node): GenerationChild {
       return {
         children,
         tag: 'url',
-        tagSuffix: '=' + href.value,
+        tagSuffix: `=${href.value}`,
       };
     }
 

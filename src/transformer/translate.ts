@@ -181,9 +181,21 @@ function translatePreset(origin: string): string {
   }
 
   const presets: Record<string, string> = {
-    'hanamura temple': '花村寺',
-    'alterac pass': '奥特兰克战道',
+    'dragon shire': '巨龙镇',
+    'tomb of the spider queen': '蛛后墓',
+    'cursed hollow': '诅咒谷',
+    'garden of terror': '恐魔园',
+    'blackheart\'s bay': '黑心湾',
+    'sky temple': '天空殿',
+    'haunted mine': '鬼灵矿',
     'towers of doom': '末日塔',
+    'infernal shrines': '炼狱圣坛',
+    'battlefield of eternity': '永恒战场',
+    'braxis holdout': '布拉克希斯禁区',
+    'warhead junction': '弹头枢纽站',
+    'hanamura temple': '花村寺',
+    'volskaya foundry': '沃斯卡娅铸造厂',
+    'alterac pass': '奥特兰克战道',
 
     passive: '被动',
     active: '主动',

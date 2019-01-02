@@ -152,7 +152,7 @@ describe('test generateBbsCode()', () => {
   test('correctly translate hero name for Lt. Morales', () => {
     const htmlNode = <parse5.DefaultTreeDocumentFragment>parse5.parseFragment(
       `<span style="font-size:14px;">
-      <strong>Lt.</strong> <strong>Morales：</strong> 
+      <strong>Lt.</strong> <strong>Morales：</strong>
       </span>`,
       );
     const node = standardizeTree(htmlNode.childNodes[0]);
