@@ -197,11 +197,18 @@ function translatePreset(origin: string): string {
     'volskaya foundry': '沃斯卡娅铸造厂',
     'alterac pass': '奥特兰克战道',
 
+    heroes: '英雄',
+    general: '综合',
+    'quick navigation': '目录',
+    'bug fixes': '错误修正',
+    'new hero': '新英雄',
+    return: '',
+
+    miscellaneous: '综合',
     passive: '被动',
     active: '主动',
     removed: '已移除',
     'new talent': '新天赋',
-    'quick navigation': '目录',
     talent: '天赋',
     trait: '特质',
     'new trait': '新特质',
@@ -211,14 +218,10 @@ function translatePreset(origin: string): string {
     'developer comment': '开发者评论',
     'developer comments': '开发者评论',
     'ptr note': '测试服注释',
-    general: '综合',
-    miscellaneous: '综合',
     art: '美术',
     shop: '商店',
     'user interface': '界面',
     design: '设计',
-    'bug fixes': '错误修正',
-    'new hero': '新英雄',
     mounts: '坐骑',
     mount: '坐骑',
     'new mounts': '新坐骑',
@@ -341,10 +344,12 @@ interface IParsedUnit {
 }
 
 function parseUnit(str: string): IParsedUnit {
-  const matchPer = /(% )?(.*)(?: per (.*))?/i.exec(str);
-  const percentage: boolean = !!(matchPer && _.trim(matchPer[1]));
-  const unit = matchPer ? _.trim(matchPer[2]) : '';
-  const per = matchPer ? _.trim(matchPer[3]) : '';
+  const cutPercentage = cutPrefix(str, '%');
+  const percentage = cutPercentage !== str;
+
+  const matchPer = /^(.*)(?: per (.*))?$/i.exec(_.trim(cutPercentage));
+  const unit = matchPer ? _.trim(matchPer[1]) : '';
+  const per = matchPer ? _.trim(matchPer[2]) : '';
 
   return {
     unit,
@@ -405,12 +410,12 @@ function translateProperty(origin: string): string {
   }
 
   let tryingCutting = origin.toLowerCase();
-  let afterPrefixes: string = '';
+  const afterPrefixes: string[] = [];
   let prefixMinMax: string = '';
-  let afterSuffixes: string = '';
+  const afterSuffixes: string[] = [];
   let suffixAmount: string = '';
   while (true) {
-    const beforeCutting = tryingCutting;
+    let beforeCutting = tryingCutting;
 
     tryingCutting = cutPrefix(tryingCutting, ['max ', 'maximum ']);
     if (tryingCutting !== beforeCutting) {
@@ -426,56 +431,63 @@ function translateProperty(origin: string): string {
 
     tryingCutting = cutPrefix(tryingCutting, 'base ');
     if (tryingCutting !== beforeCutting) {
-      afterPrefixes += '基础';
+      afterPrefixes.push('基础');
       continue;
     }
 
     tryingCutting = cutPrefix(tryingCutting, 'bonus ');
     if (tryingCutting !== beforeCutting) {
-      afterSuffixes += '加成';
+      afterSuffixes.push('加成');
       continue;
     }
 
-    tryingCutting = cutSuffix(tryingCutting, [' bonus', ' gain', 'granted']);
+    tryingCutting = cutSuffix(tryingCutting, [' bonus', ' gain', ' granted']);
     if (tryingCutting !== beforeCutting) {
-      afterSuffixes += '加成';
+      afterSuffixes.push('加成');
       continue;
     }
 
     tryingCutting = cutSuffix(tryingCutting, ' refund');
     if (tryingCutting !== beforeCutting) {
-      afterSuffixes += '返还';
+      afterSuffixes.push('返还');
       continue;
     }
 
     tryingCutting = cutSuffix(tryingCutting, [' regen', ' regeneration']);
     if (tryingCutting !== beforeCutting) {
-      afterSuffixes += '回复速度';
+      afterSuffixes.push('回复速度');
       continue;
     }
 
     tryingCutting = cutSuffix(tryingCutting, ' duration');
     if (tryingCutting !== beforeCutting) {
+      beforeCutting = tryingCutting;
 
       tryingCutting = cutSuffix(tryingCutting, ' reduction');
       if (tryingCutting !== beforeCutting) {
-        afterSuffixes += '降低效果持续时间';
+        afterSuffixes.push('降低效果持续时间');
         continue;
       }
 
-      afterSuffixes += '持续时间';
+      afterSuffixes.push('持续时间');
+      continue;
+    }
+
+    tryingCutting = cutSuffix(tryingCutting, ' restoration');
+    if (tryingCutting !== beforeCutting) {
+      afterSuffixes.push('回复');
       continue;
     }
 
     tryingCutting = cutSuffix(tryingCutting, ' reduction');
     if (tryingCutting !== beforeCutting) {
-      afterSuffixes += '降低量';
+      afterSuffixes.push('降低量');
       continue;
     }
 
     tryingCutting = cutSuffix(tryingCutting, ' increase');
     if (tryingCutting !== beforeCutting) {
-      afterSuffixes += '增加量';
+      afterSuffixes.push('增加量');
       continue;
     }
 
@@ -494,6 +506,7 @@ function translateProperty(origin: string): string {
     'mana cost': '法力消耗',
     'energy cost': '能量消耗',
     cooldown: '冷却时间',
+    'cast time': '施法时间',
     radius: '半径',
     range: '范围',
     healing: '治疗量',
@@ -507,6 +520,7 @@ function translateProperty(origin: string): string {
     'vision range': '视野范围',
     'sight radius': '视野范围',
     charges: '可储存次数',
+    stacks: '层数',
     'movement speed': '移动速度',
     'spell power': '法力强度',
 
@@ -523,6 +537,7 @@ function translateProperty(origin: string): string {
     root: '定身',
     silence: '沉默',
     stun: '昏迷',
+    blind: '致盲',
 
     'cast range': '施放距离',
     'full charge up': '最大蓄力',
@@ -549,24 +564,25 @@ function translateProperty(origin: string): string {
   }
 
   return _.join(
-    [afterPrefixes, prefixMinMax,
+    [_.join(afterPrefixes, ''), prefixMinMax,
       afterRoot,
-      suffixAmount, afterSuffixes],
+      suffixAmount, _.join(_.reverse(afterSuffixes), '')],
     '',
   );
 }
 
-function translateUnit(origin: string): string {
+function translateUnit(origin: string): [string, string] {
   if (!origin) {
-    return '';
+    return ['', ''];
   }
 
   const plural = pluralize(origin);
-  const dict: Record<string, string> = {
-    seconds: '秒',
+  const dict: Record<string, [string, string]> = {
+    seconds: ['', '秒'],
+    'maximum healths': ['最大生命值的', ''],
   };
 
-  return dict[plural] || origin || '';
+  return dict[plural.toLowerCase()] || ['', origin];
 }
 
 function translatePer(origin: string): [string, string] {
@@ -582,11 +598,11 @@ function translatePer(origin: string): [string, string] {
     ticks: ['', '每跳'],
   };
 
-  return dict[plural] || [`每${origin || ''}的`, ''];
+  return dict[plural.toLowerCase()] || [`每${origin || ''}的`, ''];
 }
 
 export function translateChangeFromTo(origin: string): string | null {
-  const matches = /(.*? )(?:(reduce|lower|decrease|increase)(?:s|e?d|) )?from ([\d.,]+)(%? [^.,]*?)? to ([\d.,]+)(%? [^.,]*)?/ig
+  const matches = /(.*? )(?:(reduce|lower|decrease|increase)(?:s|e?d|) )?from ([\d.,]+)(%?(?: [^.,]+?)?) to ([\d.,]+)(%?(?: [^.,]+)?)/ig
     .exec(origin);
   if (!matches) {
     return null;
@@ -612,10 +628,11 @@ export function translateChangeFromTo(origin: string): string | null {
   const afterTrend = trendUp ? '增加' : '降低';
   const afterFromNum = standardizeNum(fromNumStr) + (percentage ? '%' : '');
   const afterToNum = standardizeNum(toNumStr) + (percentage ? '%' : '');
-  const afterUnit = translateUnit(fromUnitParsed.unit || toUnitParsed.unit);
+  const [afterUnitFront, afterUnitBack] = translateUnit(fromUnitParsed.unit || toUnitParsed.unit);
   const [afterPerAtStart, afterPerAtNum] = translatePer(perStr);
 
-  return `${afterPerAtStart}${afterProperty}从${afterPerAtNum}${afterFromNum}${afterUnit}${afterTrend}到${afterToNum}${afterUnit}`;
+  // tslint:disable-next-line:max-line-length
+  return `${afterPerAtStart}${afterProperty}从${afterUnitFront}${afterPerAtNum}${afterFromNum}${afterUnitBack}${afterTrend}到${afterToNum}${afterUnitBack}`;
 }
 
 function translateToken(origin: string) {
