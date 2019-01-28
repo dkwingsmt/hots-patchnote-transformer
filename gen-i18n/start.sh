@@ -12,6 +12,7 @@ echo Dir ${DIR}
 if [ "$SKIP" = true ] ; then
   echo "Build skipped."
 else
+  mkdir -p output/
   dotnet-heroes-data -s "${DIR}" -l enUS --localized-text --json -o output/ | tee output/_info
   mv output/_info output/info
   dotnet-heroes-data -s "${DIR}" -l zhCN --localized-text --json -o output/ 
