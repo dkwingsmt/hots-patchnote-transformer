@@ -8,6 +8,7 @@
   "scripts": {
     "build": "tsc",
     "start": "./start.sh",
+    "test": "echo No tests",
     "install-tool": "./check-dotnet.sh && dotnet tool install --global HeroesDataParser",
     "update-tool": "dotnet tool update --global HeroesDataParser",
     "combine": "node ./build/index.js"

@@ -1,5 +1,5 @@
 {
-  "name": "@html2nga/hots-transform-cli",
+  "name": "@html2nga/hots-cli",
   "version": "0.0.1",
   "author": "DKWings",
   "description": "Conver Blizzard blue post to NGA BBS code",
@@ -7,7 +7,7 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "tsc",
-    "test": "jest",
+    "test": "echo No tests",
     "watch": "tsc --watch",
     "lint": "tslint"
   },

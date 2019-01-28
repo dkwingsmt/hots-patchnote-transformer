@@ -5,17 +5,17 @@
 ### Install
 ```
 git clone 
-yarn
+yarn run init
 ```
 
 ### Run
 ```
-yarn start
+yarn run start-web
 ```
 
 ### Deploy
 ```
-yarn deploy
+yarn run deploy-web
 ```
 
 ### Test
