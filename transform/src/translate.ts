@@ -2,7 +2,7 @@ import _ from 'lodash';
 import moment from 'moment';
 
 import pluralize from 'pluralize';
-import i18nDict from '../external/i18n';
+import i18nDict from './external/i18n';
 import { Node } from './const';
 import { toI18nKey } from './utils';
 

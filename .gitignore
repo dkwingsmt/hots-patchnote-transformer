@@ -1,9 +1,6 @@
 .DS_Store
 .tags
 
-build
-docker/build
-
 */debug
 codegen
 *.pyc

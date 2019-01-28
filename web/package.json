@@ -1,0 +1,66 @@
+{
+  "name": "@html2nga/hots-web",
+  "version": "0.0.1",
+  "author": "DKWings",
+  "description": "Conver Blizzard blue post to NGA BBS code",
+  "private": true,
+  "main": "build/index.js",
+  "scripts": {
+    "build-cli": "tsc ./src/cli.ts",
+    "transform": "node ./build/src/cli.js",
+    "start": "PORT=8000 react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "lint": "eslint .",
+    "predeploy": "yarn run build",
+    "deploy": "gh-pages -d build"
+  },
+  "homepage": "http://tong.mu/hots-patchnote-transformer",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dkwingsmt/hots-patchnote-transformer"
+  },
+  "dependencies": {
+    "@material-ui/core": "^3.5.1",
+    "@html2nga/hots-transform": "^0.0.1",
+    "bluebird": "^3.4.6",
+    "core-js": "^2.4.1",
+    "jest": "^23.6.0",
+    "jsonp": "^0.2.1",
+    "keycode": "^2.2.0",
+    "lodash": "^4.17.10",
+    "prop-types": "^15.6.2",
+    "react": "16.7.0-alpha.2",
+    "react-dom": "16.7.0-alpha.2",
+    "react-scripts": "^2.1.1",
+    "react-svg-inline": "^2.1.1",
+    "request": "^2.79.0",
+    "request-promise": "^4.2.2",
+    "simple-icons": "^1.9.14",
+    "ts-jest": "^23.10.4",
+    "typescript": "^3.0.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^23.3.9",
+    "@types/lodash": "^4.14.116",
+    "@types/request-promise": "^4.1.42",
+    "eslint-config-airbnb": "^13.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^2.2.3",
+    "eslint-plugin-react": "^6.10.0",
+    "eslint-plugin-react-hooks": "^0.0.0",
+    "gh-pages": "^2.0.1",
+    "ts-node": "^7.0.1",
+    "tslint": "^5.12.0",
+    "tslint-consistent-codestyle": "^1.14.1",
+    "tslint-eslint-rules": "^5.4.0",
+    "tslint-microsoft-contrib": "^6.0.0"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}

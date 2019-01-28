@@ -1,0 +1,71 @@
+{
+  "extends": [
+    "tslint:latest",
+    "tslint-consistent-codestyle",
+    "tslint-eslint-rules",
+    "tslint-microsoft-contrib"
+  ],
+  "linterOptions": {
+    "exclude": ["**/*.js", "**/*.json", "i18n.js", "./build/", "./node_modules/"]
+  },
+  "rules": {
+    "newline-per-chained-call": false,
+    "no-null-keyword": false,
+    "no-submodule-imports": false,
+    "no-relative-imports": false,
+    "no-constant-condition": false,
+    "trailing-comma": [true, {"multiline": "always", "singleline": "never", "esSpecCompliant": true}],
+    "missing-jsdoc": false,
+    "jsx-boolean-value": false,
+    "no-single-line-block-comment": false,
+    "no-implicit-dependencies": false,
+    "jsx-no-multiline-js": false,
+    "jsx-no-lambda": false,
+    "variable-name": [true, "check-format", "allow-pascal-case", "ban-keywords", "allow-leading-underscore"],
+    "react-this-binding-issue": [ true, { "allow-anonymous-listeners": true } ],
+    "export-name": false,
+    "no-empty-interface": false,
+    "typedef": [true, "parameter", "arrow-parameter", "property-declaration"],
+    "brace-style": [true, "1tbs"],
+    "object-curly-spacing": true,
+    "no-multi-spaces": true,
+    "no-unused": [true, {"ignore-pattern": "^_"}],
+    "underscore-consistent-invocation": [true, { "style": "static" }],
+    "prefer-const-enum": true,
+    "no-suspicious-comment": false,
+    "no-static-this": true,
+    "no-unnecessary-else": true,
+    "mocha-no-side-effect-code": false,
+    "mocha-avoid-only": false,
+    "completed-docs": false,
+    "mocha-unneeded-done": false,
+    "strict-boolean-expressions": false,
+    "no-empty": false,
+    "await-promise": [true, "Bluebird"],
+    "no-console": [true, "log"],
+    "ter-indent": [true, 2, {
+      "SwitchCase": 0,
+      "outerIIFEBody": 1,
+      "MemberExpression": 1,
+      "FunctionDeclaration": { "body": 1, "parameters": 1 },
+      "FunctionExpression": { "body": 1, "parameters": 1 },
+      "CallExpression": { "arguments": 1 }
+    }],
+    "import-name": [false, {
+      "lodash": "_",
+      "bluebird": "Promise",
+      "reactJss": "injectSheet",
+      "classnames": "classNames",
+      "requestPromise": "rp",
+      "*Scss": "*Classes",
+      "color": "Color"
+    }],
+    "function-name": [true, {
+      "method-regex": "^[a-z][\\w\\d]+$",
+      "private-method-regex": "^[a-z][\\w\\d]+$",
+      "protected-method-regex": "^[a-z][\\w\\d]+$",
+      "static-method-regex": "^([A-Z_\\d]+|getDerivedStateFromProps)$",
+      "function-regex": "^[a-z][\\w\\d]+$"
+    }]
+  }
+}

@@ -14,7 +14,7 @@ import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 
-import { pageToBbsCode } from '../transformer/index.ts';
+import { pageToBbsCode } from '@html2nga/hots-transform';
 
 const LS_KEY_LAST_URL = 'hots-patchnote-transform/last-url';
 

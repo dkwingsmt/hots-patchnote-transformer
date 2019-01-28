@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { argv, exit } from 'process';
 import rp from 'request-promise';
 
-import { pageToBbsCode } from './transformer';
+import { pageToBbsCode } from '@html2nga/hots-transform';
 
 export interface IPageInfo {
   url?: string;

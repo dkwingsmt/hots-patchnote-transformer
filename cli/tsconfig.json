@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "outDir": "lib",
+    "noImplicitAny": true,
+    "sourceMap": true,
+    "module": "esnext",
+    "target": "es6",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "lib": [
+      "es2017"
+    ],
+    "moduleResolution": "node",
+    "strictNullChecks": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true
+  },
+  "exclude": [
+    "node_modules",
+    "build",
+    "**/*.spec.ts"
+  ],
+  "include": [
+    "src"
+  ]
+}

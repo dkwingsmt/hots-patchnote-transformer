@@ -1,0 +1,37 @@
+{
+  "name": "@html2nga/hots-transform-cli",
+  "version": "0.0.1",
+  "author": "DKWings",
+  "description": "Conver Blizzard blue post to NGA BBS code",
+  "private": true,
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "watch": "tsc --watch",
+    "lint": "tslint"
+  },
+  "homepage": "http://tong.mu/hots-patchnote-transformer",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dkwingsmt/hots-patchnote-transformer"
+  },
+  "dependencies": {
+    "@html2nga/hots-transform": "^0.0.1",
+    "lodash": "^4.17.10"
+  },
+  "devDependencies": {
+    "jest": "^23.6.0",
+    "ts-jest": "^23.10.4",
+    "typescript": "^3.0.1",
+    "@types/jest": "^23.3.9",
+    "@types/lodash": "^4.14.116",
+    "@types/parse5": "^5.0.0",
+    "@types/pluralize": "^0.0.29",
+    "ts-node": "^7.0.1",
+    "tslint": "^5.12.0",
+    "tslint-consistent-codestyle": "^1.14.1",
+    "tslint-eslint-rules": "^5.4.0",
+    "tslint-microsoft-contrib": "^6.0.0"
+  }
+}

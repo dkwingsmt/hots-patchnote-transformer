@@ -2,10 +2,11 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './web/App';
+
+import App from './App';
 // tslint:disable-next-line:no-import-side-effect
-import './web/index.css';
-import * as serviceWorker from './web/serviceWorker';
+import './index.css';
+import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(<App />, document.getElementById('root'));
 
