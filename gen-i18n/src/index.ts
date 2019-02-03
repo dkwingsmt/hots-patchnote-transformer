@@ -1,5 +1,4 @@
-import { DH_NOT_SUITABLE_GENERATOR } from 'constants';
-import fs, { writeJson } from 'fs-extra';
+import fs from 'fs-extra';
 import _ from 'lodash';
 import yargs from 'yargs';
 
@@ -10,7 +9,7 @@ interface IArg {
 }
 
 type DictValue = [string, string[]][];
-type Dict= Record<string, DictValue>;
+type Dict = Record<string, DictValue>;
 
 function insertEntry(prevDict: Dict, key: string, from: string, to: string): Dict {
   const prevDictValue = prevDict[key] || [];
