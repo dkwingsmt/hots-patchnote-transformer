@@ -84,7 +84,7 @@ export type GenerationChild = IGenerationNode | string;
 // tslint:disable-next-line:max-func-body-length cyclomatic-complexity
 export function bbsTreeToGenerationTree(node: Node): GenerationChild {
   if (node.kind === 'text') {
-    return _.trim(node.text);
+    return node.text.replace(/(^\s{2,})|(\s{2,}$)|(^\t|\t$)/,"")
   }
 
   // Node types to skip
