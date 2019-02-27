@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-OUT="../src/external/i18n.ts"
+OUT="../transform/src/external/i18n.ts"
 if [ "$PTR" = true ] ; then
 DIR="/Applications/Heroes of the Storm Public Test/"
 else

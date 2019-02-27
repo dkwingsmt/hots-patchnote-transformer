@@ -1,4 +1,5 @@
 import fs from 'fs-extra';
+import { dirname } from 'path';
 import _ from 'lodash';
 import yargs from 'yargs';
 
@@ -116,6 +117,7 @@ ${formatContent(result)}
 export default i18nDict;
 `;
 
+  await fs.ensureDir(dirname(out));
   return fs.writeFile(
     out,
     content,
