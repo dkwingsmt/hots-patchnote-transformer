@@ -69,12 +69,23 @@ describe('test translateChangeBy', () => {
     ).toBe('伤害增加20%');
   });
 
+  test('percentage (2nd form)', () => {
+    expect(
+      translateChangeBy('Damage increased by 20%'),
+    ).toBe('伤害增加20%');
+  });
+
   test('require start of text', () => {
     expect(
       translateChangeBy('Hitting an enemy Hero increases Lunara\'s Movement Speed by 15% for 3 seconds'),
     ).toBe(null);
   });
 
+  test('approx', () => {
+    expect(
+      translateChangeBy('Basic Attack speed reduced by ~12%'),
+    ).toBe('普通攻击速度降低约12%');
+  });
 });
 
 describe('test translatePhrase', () => {

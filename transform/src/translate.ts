@@ -641,15 +641,25 @@ export function translateChangeFromTo(origin: string): string | null {
 }
 
 export function translateChangeBy(origin: string): string | null {
-  const matches = /^(reduce|lower|decrease|increase)(?:s|e?d|) (.*) by ([\d.,]+)(%?(?: [^.,]+?)?)$/i
+  let matches = /^(reduce|lower|decrease|increase)(?:s|e?d|) (.*) by (~?)([\d.,]+)(%?(?: [^.,]+?)?)$/i
     .exec(origin);
+  if (!matches) {
+    matches = /^(.*) (reduce|lower|decrease|increase)(?:e?d) by (~?)([\d.,]+)(%?(?: [^.,]+?)?)$/i
+      .exec(origin);
+    if (matches) {
+      const property = matches[1];
+      matches[1] = matches[2];
+      matches[2] = property;
+    }
+  }
   if (!matches) {
     return null;
   }
   const specifiedTrend = (matches[1] || '').toLowerCase();
   const property = _.trim(matches[2] || '').toLowerCase();
-  const byNumStr = matches[3];
-  const byUnit = matches[4] || '';
+  const approxStr = matches[3];
+  const byNumStr = matches[4];
+  const byUnit = matches[5] || '';
 
   const trendUp = ['increase'].includes(specifiedTrend);
   const byUnitParsed = parseUnit(byUnit);
@@ -660,12 +670,13 @@ export function translateChangeBy(origin: string): string | null {
 
   const afterProperty = translateProperty(bareProperty);
   const afterTrend = trendUp ? '增加' : '降低';
+  const afterApprox = approxStr ? '约' : '';
   const afterByNum = standardizeNum(byNumStr) + (percentage ? '%' : '');
   const [afterUnitFront, afterUnitBack] = translateUnit(byUnitParsed.unit);
   const [afterPerAtStart, afterPerAtNum] = translatePer(perStr);
 
   // tslint:disable-next-line:max-line-length
-  return `${afterPerAtStart}${afterProperty}${afterTrend}${afterUnitFront}${afterPerAtNum}${afterByNum}${afterUnitBack}`;
+  return `${afterPerAtStart}${afterProperty}${afterTrend}${afterApprox}${afterUnitFront}${afterPerAtNum}${afterByNum}${afterUnitBack}`;
 }
 
 
