@@ -32,6 +32,9 @@ describe('test translateChangeFromTo', () => {
     expect(
       translateChangeFromTo('Duration reduced from 2 to .5 second'),
     ).toBe('持续时间从2秒降低到0.5秒');
+    expect(
+      translateChangeFromTo('Healing reduced from 1.25% max Health to 1% max Health'),
+    ).toBe('治疗量从最大生命值的1.25%降低到1%');
   });
 
   test('percentage', () => {
