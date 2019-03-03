@@ -16,6 +16,12 @@ describe('test translateChangeFromTo', () => {
     ).toBe('致盲持续时间加成从0.5秒增加到0.75秒');
   });
 
+  test('Different units', () => {
+    expect(
+      translateChangeFromTo('Cooldown reduction changed from .75 seconds to 5% of Cho and Gall’s Heroic abilities'),
+    ).toBe('冷却时间降低量从0.75秒增加到5%of Cho and Gall’s Heroic abilities');
+  })
+
   test('per-string', () => {
     expect(
       translateChangeFromTo('Damage bonus reduced from 5 to 4 per stack'),
@@ -34,7 +40,7 @@ describe('test translateChangeFromTo', () => {
     ).toBe('持续时间从2秒降低到0.5秒');
     expect(
       translateChangeFromTo('Healing reduced from 1.25% max Health to 1% max Health'),
-    ).toBe('治疗量从最大生命值的1.25%降低到1%');
+    ).toBe('治疗量从最大生命值的1.25%降低到最大生命值的1%');
   });
 
   test('percentage', () => {
@@ -43,7 +49,7 @@ describe('test translateChangeFromTo', () => {
     ).toBe('伤害从1%增加到1.25%');
     expect(
       translateChangeFromTo('Healing increased from 10% to 15% maximum Health'),
-    ).toBe('治疗量从最大生命值的10%增加到15%');
+    ).toBe('治疗量从最大生命值的10%增加到最大生命值的15%');
   });
 
   test('change up', () => {

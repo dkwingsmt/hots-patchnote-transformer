@@ -628,27 +628,30 @@ export function translateChangeFromTo(origin: string): string | null {
   const [bareProperty, perFromProperty] = parsePerFromProperty(property);
 
   const perStr = perFromProperty || fromUnitParsed.per || toUnitParsed.per;
-  const percentage = fromUnitParsed.percentage || toUnitParsed.percentage;
 
   const afterProperty = translateProperty(bareProperty);
   const afterTrend = trendUp ? '增加' : '降低';
-  const afterFromNum = standardizeNum(fromNumStr) + (percentage ? '%' : '');
-  const afterToNum = standardizeNum(toNumStr) + (percentage ? '%' : '');
-  const [afterUnitFront, afterUnitBack] = translateUnit(fromUnitParsed.unit || toUnitParsed.unit);
+  const afterFromNum = standardizeNum(fromNumStr) + (fromUnitParsed.percentage ? '%' : '');
+  const afterToNum = standardizeNum(toNumStr) + (toUnitParsed.percentage ? '%' : '');
+  // Process units
+  const afterFromUnit = fromUnitParsed.unit ? translateUnit(fromUnitParsed.unit) : translateUnit(toUnitParsed.unit);
+  const afterToUnit = translateUnit(toUnitParsed.unit);
+
   const [afterPerAtStart, afterPerAtNum] = translatePer(perStr);
 
   return _.join([
     afterPerAtStart,
     afterProperty,
     '从',
-    afterUnitFront,
+    afterFromUnit[0],
     afterPerAtNum,
     afterFromNum,
-    afterUnitBack,
+    afterFromUnit[1],
     afterTrend,
     '到',
+    afterToUnit[0],
     afterToNum,
-    afterUnitBack,
+    afterToUnit[1],
   ], '');
 }
 
