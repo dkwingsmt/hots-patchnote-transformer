@@ -155,6 +155,9 @@ function translatePreset(origin: string): string {
     [/^captured (.*)$/i, '驯服的$1'],
     [/^available starting the week of ([^ ]+ [0-9]+) until ([^ ]+ [0-9]+).?$/i,
       (r: RegExpMatchArray) => `将从${moment(r[1], 'MMM D').format('M月D日')}当周开始上线，${moment(r[2], 'MMM D').format('M月D日')}截止。`],
+
+    [/^for ([\d.]+) seconds?$/i, 
+      (r: RegExpMatchArray) => `，持续${r[1]}秒`],
   ];
 
   // Find the first `preset` that whose `preset`[0] matches `origin`,
@@ -604,7 +607,7 @@ function translatePer(origin: string): [string, string] {
 }
 
 export function translateChangeFromTo(origin: string): string | null {
-  const matches = /(.*? )(?:(reduce|lower|decrease|increase)(?:s|e?d|) )?from ([\d.,]+)(%?(?: [^.,]+?)?) to ([\d.,]+)(%?(?: [^.,]+)?)/ig
+  const matches = /(.*? )(?:(reduce|lower|decrease|increase|change)(?:s|e?d|) )?from ([\d.,]+)(%?(?: [^.,]+?)?) to ([\d.,]+)(%?(?: [^.,]+)?)/ig
     .exec(origin);
   if (!matches) {
     return null;
@@ -616,9 +619,9 @@ export function translateChangeFromTo(origin: string): string | null {
   const toNumStr = matches[5];
   const toUnit = matches[6] || '';
 
-  const trendUp = specifiedTrend ?
+  const trendUp = (specifiedTrend && !['change'].includes(matches[2])) ?
     ['increase'].includes(specifiedTrend) :
-    _.trim(toNumStr, '%') > _.trim(fromNumStr, '%');
+    parseFloat(standardizeNum(toNumStr)) > parseFloat(standardizeNum(fromNumStr));
   const fromUnitParsed = parseUnit(fromUnit);
   const toUnitParsed = parseUnit(toUnit);
   const [bareProperty, perFromProperty] = parsePerFromProperty(property);

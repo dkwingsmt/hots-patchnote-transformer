@@ -21,7 +21,6 @@ describe('test translateChangeFromTo', () => {
       translateChangeFromTo('Damage bonus reduced from 5 to 4 per stack'),
     ).toBe('每层的伤害加成从5降低到4');
   });
-  
 
   test('per-string fallback', () => {
     expect(
@@ -43,8 +42,25 @@ describe('test translateChangeFromTo', () => {
       translateChangeFromTo('Healing increased from 10% to 15% maximum Health'),
     ).toBe('治疗量从最大生命值的10%增加到15%');
   });
-});
 
+  test('change up', () => {
+    expect(
+      translateChangeFromTo('Duration changed from 2 to 2.5 second'),
+    ).toBe('持续时间从2秒增加到2.5秒');
+  });
+
+  test('change down', () => {
+    expect(
+      translateChangeFromTo('Duration changed from 2 to .5 second'),
+    ).toBe('持续时间从2秒降低到0.5秒');
+  });
+
+  test('change down (percentage)', () => {
+    expect(
+      translateChangeFromTo('Effect changed from 2% to .5%'),
+    ).toBe('effect从2%降低到0.5%');
+  });
+});
 
 describe('test translateChangeBy', () => {
   test('percentage', () => {
@@ -60,6 +76,7 @@ describe('test translateChangeBy', () => {
   });
 
 });
+
 describe('test translatePhrase', () => {
   describe('certain translations', () => {
     expect(
