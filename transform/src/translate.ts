@@ -484,6 +484,12 @@ function translateProperty(origin: string): string {
       continue;
     }
 
+    tryingCutting = cutSuffix(tryingCutting, ' scaling');
+    if (tryingCutting !== beforeCutting) {
+      afterSuffixes.push('成长');
+      continue;
+    }
+
     tryingCutting = cutSuffix(tryingCutting, ' reduction');
     if (tryingCutting !== beforeCutting) {
       afterSuffixes.push('降低量');
@@ -561,6 +567,7 @@ function translateProperty(origin: string): string {
     'charge count': '储存层数',
     'explosion radius': '爆炸范围',
     'teleport range': '传送距离',
+    'leash range': '脱战范围',
   };
 
   const afterRoot = rootDict[tryingCutting] || tryingCutting;
