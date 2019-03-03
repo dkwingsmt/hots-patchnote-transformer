@@ -123,8 +123,12 @@ function translatePreset(origin: string): string {
     [/^Moved from level (\d*) to level (\d*).?$/i, '从$1级移到$2级'],
     [/^Moved from level (\d*).?$/i, '移自$1级'],
     [/^Moved to level (\d*).?$/i, '移至$1级'],
-    [/^heroes of the storm (ptr )?(balance )?patch notes$/gi, (r: RegExpMatchArray) =>
-      `《风暴英雄》${ifExist(r[1], '公开测试服')}${ifExist(r[2], '')}更新说明`],
+
+    [/^heroes of the storm (ptr )?(balance )?(live )?(hotfix )?(patch )?notes$/gi, (r: RegExpMatchArray) =>
+      `《风暴英雄》${ifExist(r[1], '公开测试服')}${ifExist(r[2], '平衡')}${ifExist(r[3], '正式服')}${ifExist(r[4], '在线修正')}更新说明`],
+    [/^orange text indicates a (:?difference|change) between (the )?ptr and live (patch )? notes.$/gi, (r: RegExpMatchArray) =>
+      '橙色文字表示公开测试服与正式服日志之间的区别'],
+
     [/^now (.*)$/i, (r: RegExpMatchArray) => `现在${translatePhrase(r[1])}`],
     [/^also (.*)$/i, (r: RegExpMatchArray) => `还会${translatePhrase(r[1])}`],
     [/^renamed to (.*)$/i, (r: RegExpMatchArray) => `重命名为${translatePhrase(r[1])}`],
@@ -313,13 +317,11 @@ function translatePreset(origin: string): string {
     'removed from rotation': '自轮替列表移除',
     'the full ranked battleground rotation is now as follows': '完整的排名对战战场轮替列表如下',
     'the ranked map rotation has been updated to include the following': '排位赛地图轮换已更新',
-    'heroes of the storm ptr notes': '《风暴英雄》公开测试服补丁说明',
     'heroes & talents': '英雄与天赋',
     'target info panel': '目标信息面板',
     'new bundles and skin packs': '新的礼包和皮肤包',
     'the following new bundles will soon become available for a limited time': '以下新的礼包很快将限时上线',
     'fixed a number of typo and tooltip errors across several aspects of the game': '修复了游戏中多处拼写错误和提示文字错误',
-    'orange text indicates a difference between the ptr and live patch notes.': '橙色文字表示公开测试服与正式服日志之间的区别',
     note: '注',
   };
 
@@ -347,7 +349,7 @@ function parseUnit(str: string): IParsedUnit {
   const cutPercentage = cutPrefix(str, '%');
   const percentage = cutPercentage !== str;
 
-  const matchPer = /^(.*)(?: per (.*))?$/i.exec(_.trim(cutPercentage));
+  const matchPer = /^(.*?) ?(?:per (.*))?$/i.exec(_.trim(cutPercentage));
   const unit = matchPer ? _.trim(matchPer[1]) : '';
   const per = matchPer ? _.trim(matchPer[2]) : '';
 

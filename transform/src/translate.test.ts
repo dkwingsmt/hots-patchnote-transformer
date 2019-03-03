@@ -16,6 +16,13 @@ describe('test translateChangeFromTo', () => {
     ).toBe('致盲持续时间加成从0.5秒增加到0.75秒');
   });
 
+  test('per-string', () => {
+    expect(
+      translateChangeFromTo('Damage bonus reduced from 5 to 4 per stack'),
+    ).toBe('每层的伤害加成从5降低到4');
+  });
+  
+
   test('per-string fallback', () => {
     expect(
       translateChangeFromTo('Spell power per random-things reduced from 1750 to 1662'),
