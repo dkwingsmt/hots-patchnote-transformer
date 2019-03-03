@@ -637,15 +637,49 @@ export function translateChangeFromTo(origin: string): string | null {
   return `${afterPerAtStart}${afterProperty}从${afterUnitFront}${afterPerAtNum}${afterFromNum}${afterUnitBack}${afterTrend}到${afterToNum}${afterUnitBack}`;
 }
 
+export function translateChangeBy(origin: string): string | null {
+  const matches = /^(reduce|lower|decrease|increase)(?:s|e?d|) (.*) by ([\d.,]+)(%?(?: [^.,]+?)?)$/i
+    .exec(origin);
+  if (!matches) {
+    return null;
+  }
+  const specifiedTrend = (matches[1] || '').toLowerCase();
+  const property = _.trim(matches[2] || '').toLowerCase();
+  const byNumStr = matches[3];
+  const byUnit = matches[4] || '';
+
+  const trendUp = ['increase'].includes(specifiedTrend);
+  const byUnitParsed = parseUnit(byUnit);
+  const [bareProperty, perFromProperty] = parsePerFromProperty(property);
+
+  const perStr = perFromProperty || byUnitParsed.per;
+  const percentage = byUnitParsed.percentage;
+
+  const afterProperty = translateProperty(bareProperty);
+  const afterTrend = trendUp ? '增加' : '降低';
+  const afterByNum = standardizeNum(byNumStr) + (percentage ? '%' : '');
+  const [afterUnitFront, afterUnitBack] = translateUnit(byUnitParsed.unit);
+  const [afterPerAtStart, afterPerAtNum] = translatePer(perStr);
+
+  // tslint:disable-next-line:max-line-length
+  return `${afterPerAtStart}${afterProperty}${afterTrend}${afterUnitFront}${afterPerAtNum}${afterByNum}${afterUnitBack}`;
+}
+
+
 function translateToken(origin: string) {
   const queryResult = i18nDict[toI18nKey(origin)];
   if (queryResult) {
     return queryResult[0][0];
   }
 
-  const tryChange = translateChangeFromTo(origin);
-  if (tryChange) {
-    return tryChange;
+  const tryChangeFromTo = translateChangeFromTo(origin);
+  if (tryChangeFromTo) {
+    return tryChangeFromTo;
+  }
+
+  const tryChangeBy = translateChangeBy(origin);
+  if (tryChangeBy) {
+    return tryChangeBy;
   }
 
   return translatePreset(origin);

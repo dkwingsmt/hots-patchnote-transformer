@@ -1,4 +1,4 @@
-import { translateChangeFromTo, translatePhrase } from './translate';
+import { translateChangeFromTo, translateChangeBy, translatePhrase } from './translate';
 
 describe('test translateChangeFromTo', () => {
   test('base', () => {
@@ -45,6 +45,21 @@ describe('test translateChangeFromTo', () => {
   });
 });
 
+
+describe('test translateChangeBy', () => {
+  test('percentage', () => {
+    expect(
+      translateChangeBy('Increase damage by 20%'),
+    ).toBe('伤害增加20%');
+  });
+
+  test('require start of text', () => {
+    expect(
+      translateChangeBy('Hitting an enemy Hero increases Lunara\'s Movement Speed by 15% for 3 seconds'),
+    ).toBe(null);
+  });
+
+});
 describe('test translatePhrase', () => {
   describe('certain translations', () => {
     expect(
