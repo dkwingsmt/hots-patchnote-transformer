@@ -585,6 +585,7 @@ function translateUnit(origin: string): [string, string] {
   const dict: Record<string, [string, string]> = {
     seconds: ['', '秒'],
     'maximum healths': ['最大生命值的', ''],
+    'max healths': ['最大生命值的', ''],
   };
 
   return dict[plural.toLowerCase()] || ['', origin];
@@ -607,7 +608,7 @@ function translatePer(origin: string): [string, string] {
 }
 
 export function translateChangeFromTo(origin: string): string | null {
-  const matches = /(.*? )(?:(reduce|lower|decrease|increase|change)(?:s|e?d|) )?from ([\d.,]+)(%?(?: [^.,]+?)?) to ([\d.,]+)(%?(?: [^.,]+)?)/ig
+  const matches = /^(.*? )(?:(reduce|lower|decrease|increase|change)(?:s|e?d|) )?from ([\d.,]+)(%?(?: [^.,]+?)?) to ([\d.,]+)(%?(?: [^.,]+)?)$/i
     .exec(origin);
   if (!matches) {
     return null;
@@ -636,8 +637,19 @@ export function translateChangeFromTo(origin: string): string | null {
   const [afterUnitFront, afterUnitBack] = translateUnit(fromUnitParsed.unit || toUnitParsed.unit);
   const [afterPerAtStart, afterPerAtNum] = translatePer(perStr);
 
-  // tslint:disable-next-line:max-line-length
-  return `${afterPerAtStart}${afterProperty}从${afterUnitFront}${afterPerAtNum}${afterFromNum}${afterUnitBack}${afterTrend}到${afterToNum}${afterUnitBack}`;
+  return _.join([
+    afterPerAtStart,
+    afterProperty,
+    '从',
+    afterUnitFront,
+    afterPerAtNum,
+    afterFromNum,
+    afterUnitBack,
+    afterTrend,
+    '到',
+    afterToNum,
+    afterUnitBack,
+  ], '');
 }
 
 export function translateChangeBy(origin: string): string | null {
@@ -675,8 +687,16 @@ export function translateChangeBy(origin: string): string | null {
   const [afterUnitFront, afterUnitBack] = translateUnit(byUnitParsed.unit);
   const [afterPerAtStart, afterPerAtNum] = translatePer(perStr);
 
-  // tslint:disable-next-line:max-line-length
-  return `${afterPerAtStart}${afterProperty}${afterTrend}${afterApprox}${afterUnitFront}${afterPerAtNum}${afterByNum}${afterUnitBack}`;
+  return _.join([
+    afterPerAtStart,
+    afterProperty,
+    afterTrend,
+    afterApprox,
+    afterUnitFront,
+    afterPerAtNum,
+    afterByNum,
+    afterUnitBack,
+  ], '');
 }
 
 
