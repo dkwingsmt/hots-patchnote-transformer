@@ -37,7 +37,7 @@ function splitBracket(origin: string): SplitResult {
 }
 
 function splitSquareBracket(origin: string): SplitResult {
-  const bracketResult = /^(.*?)( *)\[([^ )])\]( *)(.*?)$/g.exec(origin);
+  const bracketResult = /^([^\[]*?)( *)\[([^ \]]+)\]( *)(.*?)$/g.exec(origin);
   if (bracketResult) {
     const [
       _o, // tslint:disable-line:no-unused
