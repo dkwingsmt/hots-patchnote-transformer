@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/hots-patchnote-transformer/precache-manifest.b979c62c5b30beee9b9d0a66f6bc3796.js"
+  "/hots-patchnote-transformer/precache-manifest.6aa9f6bdcd2e70abe87ca30f3039dda0.js"
 );
 
 workbox.clientsClaim();
