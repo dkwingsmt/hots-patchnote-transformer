@@ -1,11 +1,15 @@
 {
     "compilerOptions": {
-        "outDir": "./build/",
+        "outDir": "./lib/",
+        "noImplicitAny": true,
         "sourceMap": true,
         "resolveJsonModule": true,
         "lib": ["es2018"],
         "esModuleInterop": true,
         "strictNullChecks": true,
         "strict": true
-    }
+    },
+    "include": [
+        "src/**/*"
+    ]
 }

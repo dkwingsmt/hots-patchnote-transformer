@@ -3,6 +3,10 @@
   "private": true,
   "scripts": {
     "install": "yarn workspaces run install",
+    "check-tools": "./scripts/check-tools.sh",
+    "extract-data": "./scripts/extract-data.sh",
+    "build-i18n": "./scripts/build-i18n.sh",
+
     "init": "yarn && yarn run build-transform",
     "test": "yarn workspaces run test",
     "build-transform": "yarn workspace @html2nga/hots-transform build",

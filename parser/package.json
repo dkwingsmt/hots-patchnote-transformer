@@ -1,13 +1,13 @@
 {
   "name": "@html2nga/hots-parser",
   "version": "0.0.1",
-  "main": "src/index.ts",
+  "main": "lib/index.js",
   "author": "DKWings",
   "license": "MIT",
   "private": true,
   "scripts": {
     "build": "tsc",
-    "start": "yarn build && node ./build"
+    "start": "node ./lib/index.js"
   },
   "devDependencies": {
     "@types/fs-extra": "^5.0.4",
@@ -17,7 +17,7 @@
     "tslint-consistent-codestyle": "^1.14.1",
     "tslint-eslint-rules": "^5.4.0",
     "tslint-microsoft-contrib": "^6.0.0",
-    "typescript": "^3.2.2"
+    "typescript": "^3.6"
   },
   "dependencies": {
     "ajv": "^6.10.2",

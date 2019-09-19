@@ -7,6 +7,8 @@ codegen
 *.egg-info
 *node_modules
 vendor/
+tmp/
 coverage
 out*
 yarn-error.log
+debug.log

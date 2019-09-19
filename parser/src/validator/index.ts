@@ -98,11 +98,11 @@ async function main() {
       describe: 'The name of schema files and data files that will be processed',
       default: ['herodata'],
     })
-    .options('mod', {
-      alias: 'm',
+    .options('build', {
+      alias: 'b',
       type: 'number',
       demandOption: true,
-      describe: 'The mod number',
+      describe: 'The build number',
     })
     .argv;
 
@@ -110,17 +110,19 @@ async function main() {
   const schemaDir = path.resolve(argv.schema);
   const outputDir = path.resolve(argv.output);
   await ensureDir(outputDir);
-  const mod = argv.mod;
+  const build = argv.build;
 
   await Bluebird.map(argv.name, (name: string) => {
-    const dataPath = path.join(dataDir, `${name}_${mod}_enus.json`);
     const schemaPath = path.join(schemaDir, `${name}.json`);
-    const outputPath = path.join(outputDir, `${name}_enus.ts`);
-    return generateTypedData({
-      dataPath: dataPath,
-      schemaPath: schemaPath,
-      outputPath: outputPath,
-    })
+    return Bluebird.map(['enus', 'zhcn'], (language: string) => {
+      const dataPath = path.join(dataDir, `${name}_${build}_${language}.json`);
+      const outputPath = path.join(outputDir, `${name}_${language}.ts`);
+      return generateTypedData({
+        dataPath: dataPath,
+        schemaPath: schemaPath,
+        outputPath: outputPath,
+      });
+    });
   }).catch((err: Error) => console.error(err));
 }
 

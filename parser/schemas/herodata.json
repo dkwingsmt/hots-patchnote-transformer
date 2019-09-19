@@ -15,10 +15,7 @@
       "unitId": { "type": "string" },
       "hyperlinkId": { "type": "string" },
       "attributeId": { "type": "string" },
-      "difficulty": {
-        "type": "string",
-        "enum": ["Easy", "Medium", "Hard", "Very Hard"]
-      },
+      "difficulty": { "type": "string" },
       "franchise": {
         "type": "string",
         "enum": ["Warcraft", "Starcraft", "Diablo", "Overwatch", "Classic", "Nexus"]
@@ -33,10 +30,7 @@
       "releaseDate": { "type": "string", "format": "date" },
       "sight": { "type": "number" },
       "speed": { "type": "number" },
-      "type": {
-        "type": "string",
-        "enum": ["Melee", "Ranged"]
-      },
+      "type": { "type": "string" },
       "rarity": {
         "type": "string",
         "enum": ["Rare", "Epic", "Legendary"]
@@ -80,15 +74,9 @@
       },
       "roles": {
         "type": "array",
-        "items": {
-          "type": "string",
-          "enum": ["Warrior", "Assassin", "Support", "Specialist", "Multiclass"]
-        }
+        "items": { "type": "string" }
       },
-      "expandedRole": {
-        "type": "string",
-        "enum": ["Tank", "Bruiser", "Healer", "Support", "Ranged Assassin", "Melee Assassin"]
-      },
+      "expandedRole": { "type": "string" },
       "ratings": {
         "type": "object",
         "properties": {
