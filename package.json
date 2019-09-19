@@ -9,5 +9,5 @@
     "start-web": "yarn workspace @html2nga/hots-web start",
     "deploy-web": "yarn workspace @html2nga/hots-web deploy"
   },
-  "workspaces": ["web", "transform", "gen-i18n", "cli"]
+  "workspaces": ["web", "transform", "gen-i18n", "cli", "parser"]
 }

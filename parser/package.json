@@ -1,0 +1,30 @@
+{
+  "name": "@html2nga/hots-parser",
+  "version": "0.0.1",
+  "main": "src/index.ts",
+  "author": "DKWings",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "start": "yarn build && node ./build"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^5.0.4",
+    "@types/lodash": "^4.14.116",
+    "@types/yargs": "^12.0.5",
+    "tslint": "^5.12.0",
+    "tslint-consistent-codestyle": "^1.14.1",
+    "tslint-eslint-rules": "^5.4.0",
+    "tslint-microsoft-contrib": "^6.0.0",
+    "typescript": "^3.2.2"
+  },
+  "dependencies": {
+    "ajv": "^6.10.2",
+    "bluebird": "^3.5.3",
+    "fs-extra": "^8.1.0",
+    "json-schema-to-typescript": "^7.1.0",
+    "lodash": "^4.17.11",
+    "yargs": "^14.0.0"
+  }
+}

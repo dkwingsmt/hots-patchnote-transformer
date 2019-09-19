@@ -12,10 +12,7 @@ echo Dir ${DIR}
 if [ "$SKIP" = true ] ; then
   echo "Build skipped."
 else
-  mkdir -p output/
-  dotnet-heroes-data -s "${DIR}" -l enUS --localized-text --json -o output/ | tee output/_info
-  mv output/_info output/info
-  dotnet-heroes-data -s "${DIR}" -l zhCN --localized-text --json -o output/ 
+  dotnet heroes-data $DIR -o ./output -d 3 -e herodata -e heroskins -e mounts -l enUS -l zhCN
 fi
 VER=$(grep "Hots Version Build" output/info | sed -Ene "s/.* 2.[0-9]+.[0-9]+.([0-9+])/\1/p")
 echo Merging version ${VER}
