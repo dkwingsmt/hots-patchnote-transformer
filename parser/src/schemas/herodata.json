@@ -102,18 +102,7 @@
       },
       "weapons": {
         "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "nameId": { "type": "string" },
-            "range": { "type": "number" },
-            "period": { "type": "number" },
-            "damage": { "type": "number" },
-            "damageScale": { "type": "number" }
-          },
-          "required": ["nameId", "range", "period", "damage", "damageScale"],
-          "additionalProperties": false
-        }
+        "items": { "$ref": "#/definitions/Weapon" }
       },
       "abilities": {
         "type": "object",
@@ -154,19 +143,7 @@
         "required": ["basic", "heroic", "trait", "mount", "spray", "voice"],
         "additionalProperties": false
       },
-      "subAbilities": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "array",
-              "items": { "$ref": "#/definitions/Ability" }
-            }
-          }
-        }
-      },
+      "subAbilities": { "$ref": "#/definitions/SubAbilityTable" },
       "talents": {
         "oneOf": [
           {
@@ -200,7 +177,11 @@
         ]
       },
       "heroUnits": {
-        "type": "array"
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/definitions/HeroUnit" }
+        }
       }
     },
     "required": ["name", "unitId", "hyperlinkId", "attributeId",
@@ -256,8 +237,7 @@
         "$ref": "#/definitions/ChargeNumber"
       },
       "abilityType": {
-        "type": "string",
-        "enum": ["Q", "W", "E", "Heroic", "Trait", "B", "Z", "Spray", "Voice", "Active"]
+        "$ref": "#/definitions/AbilityType"
       },
       "isPassive": { "type": "boolean" },
       "isActive": { "type": "boolean" }
@@ -283,7 +263,7 @@
       "fullTooltip": { "type": "string" },
       "cooldownTooltip": { "type": "string" },
       "energyTooltip": { "type": "string" },
-      "abilityType": { "type": "string" },
+      "abilityType": { "$ref": "#/definitions/AbilityType" },
       "sort": { "type": "number" },
       "toggleCooldown": { "type": "number" },
       "isActive": { "type": "boolean" },
@@ -294,5 +274,114 @@
     "required": ["nameId", "buttonId", "name", "icon", "shortTooltip",
       "fullTooltip", "abilityType", "sort"],
     "additionalProperties": false
+  },
+
+  "AbilityType": {
+    "type": "string",
+    "enum": ["Q", "W", "E", "Heroic", "Trait", "B", "Z", "Spray", "Voice", "Active", "Passive"]
+  },
+
+  "Weapon": {
+    "type": "object",
+    "properties": {
+      "nameId": { "type": "string" },
+      "range": { "type": "number" },
+      "period": { "type": "number" },
+      "damage": { "type": "number" },
+      "damageScale": { "type": "number" }
+    },
+    "required": ["nameId", "range", "period", "damage", "damageScale"],
+    "additionalProperties": false
+  },
+
+  "HeroUnit": {
+    "type": "object",
+    "properties": {
+      "name": { "type": "string" },
+      "hyperlinkId": { "type": "string" },
+      "innerRadius": { "type": "number" },
+      "radius": { "type": "number" },
+      "sight": { "type": "number" },
+      "speed": { "type": "number" },
+      "scalingLinkId": { "type": "string" },
+      "descriptors": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
+      "units": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
+      "portraits": {
+        "type": "object",
+        "properties": {
+          "minimap": { "type": "string" },
+          "targetInfo": { "type": "string" }
+        },
+        "required": ["targetInfo", "minimap"],
+        "additionalProperties": false
+      },
+      "life": { "$ref": "#/definitions/ScalableNumber" },
+      "energy": { "$ref": "#/definitions/ScalableNumber" },
+      "weapons": {
+        "type": "array",
+        "items": { "$ref": "#/definitions/Weapon" }
+      },
+      "abilities": {
+        "type": "object",
+        "properties": {
+          "basic": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/Ability" }
+          },
+          "heroic": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/Ability" }
+          },
+          "trait": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/Ability" }
+          },
+          "hearth": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/Ability" }
+          },
+          "mount": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/Ability" }
+          },
+          "activable": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/Ability" }
+          },
+          "spray": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/Ability" }
+          },
+          "voice": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/Ability" }
+          }
+        },
+        "additionalProperties": false
+      },
+      "subAbilities": { "$ref": "#/definitions/SubAbilityTable" }
+    },
+    "required": ["name", "sight", "speed", "portraits", "life"],
+    "additionalProperties": false
+  },
+
+  "SubAbilityTable": {
+    "type": "array",
+    "items": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Ability" }
+        }
+      }
+    }
   }
 }
