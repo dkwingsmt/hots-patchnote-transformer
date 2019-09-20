@@ -25,7 +25,7 @@ SCRIPTS_PATH="$( cd "$(dirname "$0")" ; pwd -P )/"
 PROJECT_BASE=$(abs_path "${SCRIPTS_PATH}/..")
 SCHEMA_DIR="$PROJECT_BASE/parser/schemas"
 TEMP_OUTPUT_DIR="$PROJECT_BASE/tmp/typed-data"
-OUTPUT_DIR="$PROJECT_BASE/gen-i18n/src/data"
+OUTPUT_DIR="$PROJECT_BASE/gen-i18n/src/external-data"
 
 yarn workspace @html2nga/hots-parser build \
 && yarn workspace @html2nga/hots-parser start \

@@ -1,0 +1,8 @@
+{
+  "tank": "坦克",
+  "bruiser": "斗士",
+  "melee assassin": "近战刺客",
+  "ranged assassin": "远程刺客",
+  "healer": "治疗者",
+  "support": "支援型"
+}
