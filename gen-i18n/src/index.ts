@@ -21,9 +21,12 @@ function sanitizeKey(k: string): string {
 function formatContent(dict: Dict): string {
   return _(dict)
     .toPairs()
+    .map(([k, v]: [string, string]) => {
+      return [sanitizeKey(k), v];
+    })
     .sortBy()
-    .map(([k, v]: [string, [string, string[]]]) => {
-      return `  "${sanitizeKey(k)}": ${JSON.stringify(v)}`;
+    .map(([k, v]: [string, string]) => {
+      return `  "${k}": "${v}"`;
     })
     .join(',\n');
 }
