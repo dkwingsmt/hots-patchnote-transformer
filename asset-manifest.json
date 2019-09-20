@@ -1,13 +1,13 @@
 {
-  "main.css": "/hots-patchnote-transformer/static/css/main.c071a697.chunk.css",
-  "main.js": "/hots-patchnote-transformer/static/js/main.99e2707a.chunk.js",
-  "main.js.map": "/hots-patchnote-transformer/static/js/main.99e2707a.chunk.js.map",
-  "static/js/1.9c566911.chunk.js": "/hots-patchnote-transformer/static/js/1.9c566911.chunk.js",
-  "static/js/1.9c566911.chunk.js.map": "/hots-patchnote-transformer/static/js/1.9c566911.chunk.js.map",
-  "runtime~main.js": "/hots-patchnote-transformer/static/js/runtime~main.a7688f45.js",
-  "runtime~main.js.map": "/hots-patchnote-transformer/static/js/runtime~main.a7688f45.js.map",
-  "static/css/main.c071a697.chunk.css.map": "/hots-patchnote-transformer/static/css/main.c071a697.chunk.css.map",
+  "main.css": "/hots-patchnote-transformer/static/css/main.fd87373b.chunk.css",
+  "main.js": "/hots-patchnote-transformer/static/js/main.33da8a83.chunk.js",
+  "main.js.map": "/hots-patchnote-transformer/static/js/main.33da8a83.chunk.js.map",
+  "runtime~main.js": "/hots-patchnote-transformer/static/js/runtime~main.94274bda.js",
+  "runtime~main.js.map": "/hots-patchnote-transformer/static/js/runtime~main.94274bda.js.map",
+  "static/js/2.e976948f.chunk.js": "/hots-patchnote-transformer/static/js/2.e976948f.chunk.js",
+  "static/js/2.e976948f.chunk.js.map": "/hots-patchnote-transformer/static/js/2.e976948f.chunk.js.map",
   "index.html": "/hots-patchnote-transformer/index.html",
-  "precache-manifest.6aa9f6bdcd2e70abe87ca30f3039dda0.js": "/hots-patchnote-transformer/precache-manifest.6aa9f6bdcd2e70abe87ca30f3039dda0.js",
-  "service-worker.js": "/hots-patchnote-transformer/service-worker.js"
+  "precache-manifest.92dd87e348515b28a9cac450313ae5a7.js": "/hots-patchnote-transformer/precache-manifest.92dd87e348515b28a9cac450313ae5a7.js",
+  "service-worker.js": "/hots-patchnote-transformer/service-worker.js",
+  "static/css/main.fd87373b.chunk.css.map": "/hots-patchnote-transformer/static/css/main.fd87373b.chunk.css.map"
 }
