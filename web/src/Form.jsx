@@ -6,6 +6,7 @@ import keycode from 'keycode';
 import jsonp from 'jsonp';
 
 import { Button } from '@material-ui/core';
+import Typography from '@material-ui/core/Typography';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -30,7 +31,7 @@ function transform(s, { url, doTranslate }) {
   );
 }
 
-const jssClasses = {
+const formBodyClasses = {
   optionSection: {
     display: 'flex',
     margin: 10,
@@ -140,7 +141,7 @@ async function fetchWithJsonp(url, options) {
   });
 }
 
-function Form({ classes }) {
+function _FormBody({ classes }) {
   const [url, changeUrl] = useState(localStorage.getItem(LS_KEY_LAST_URL) || '');
   const [doTranslate, changeDoTranslate] = useState(true);
   const [loaderState, loaderDispatch] = useReducer(
@@ -273,8 +274,42 @@ function Form({ classes }) {
   );
 }
 
-Form.propTypes = {
+_FormBody.propTypes = {
   classes: PropTypes.objectOf(PropTypes.string).isRequired,
 };
 
-export default withStyles(jssClasses)(Form);
+const FormBody = withStyles(formBodyClasses)(_FormBody);
+
+function _Form({ classes }) {
+  return (
+    <Grid container className={classes.body}>
+      <FormBody />
+      <div className={classes.description}>
+        <Typography variant="title" gutterBottom>
+          说明
+        </Typography>
+        <Typography>
+          本工具获取目标地址的《风暴英雄》更新日志，并将其转换为 bbs.nga.com 能使用的论坛代码的形式。
+        </Typography>
+      </div>
+    </Grid>
+  );
+}
+
+const formClasses = {
+  body: {
+    maxWidth: 768,
+    margin: 'auto',
+    marginTop: 20,
+  },
+
+  description: {
+    maxWidth: 512,
+    margin: 'auto',
+    marginTop: 30,
+    padding: 20,
+    border: '1px solid #eee',
+  },
+};
+
+export default withStyles(formClasses)(_Form);

@@ -25,7 +25,7 @@ export function isTextNode(node: parse5.DefaultTreeNode): node is parse5.Default
 // }
 
 export function toI18nKey(origin: string): string {
-  return origin.toLowerCase().replace('’', '\'');
+  return origin.toLowerCase().replace(/[’.'!?]/g, '');
 }
 
 export function nl(num: number) {

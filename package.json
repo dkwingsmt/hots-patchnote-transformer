@@ -3,11 +3,15 @@
   "private": true,
   "scripts": {
     "install": "yarn workspaces run install",
+    "check-tools": "./scripts/check-tools.sh",
+    "extract-data": "./scripts/extract-data.sh",
+    "build-i18n": "./scripts/build-i18n.sh",
+
     "init": "yarn && yarn run build-transform",
     "test": "yarn workspaces run test",
     "build-transform": "yarn workspace @html2nga/hots-transform build",
     "start-web": "yarn workspace @html2nga/hots-web start",
     "deploy-web": "yarn workspace @html2nga/hots-web deploy"
   },
-  "workspaces": ["web", "transform", "gen-i18n", "cli"]
+  "workspaces": ["web", "transform", "gen-i18n", "cli", "parser"]
 }

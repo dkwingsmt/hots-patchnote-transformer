@@ -1,0 +1,375 @@
+{
+  "Main": {
+    "title": "Heroes",
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/definitions/Hero"
+    }
+  },
+
+  "Hero": {
+    "title": "Hero",
+    "type": "object",
+    "properties": {
+      "name": { "type": "string" },
+      "unitId": { "type": "string" },
+      "hyperlinkId": { "type": "string" },
+      "attributeId": { "type": "string" },
+      "difficulty": { "type": "string" },
+      "franchise": {
+        "type": "string",
+        "enum": ["Warcraft", "Starcraft", "Diablo", "Overwatch", "Classic", "Nexus"]
+      },
+      "gender": {
+        "type": "string",
+        "enum": ["Male", "Female", "Neutral"]
+      },
+      "title": { "type": "string" },
+      "innerRadius": { "type": "number" },
+      "radius": { "type": "number" },
+      "releaseDate": { "type": "string", "format": "date" },
+      "sight": { "type": "number" },
+      "speed": { "type": "number" },
+      "type": { "type": "string" },
+      "rarity": {
+        "type": "string",
+        "enum": ["Rare", "Epic", "Legendary"]
+      },
+      "scalingLinkId": { "type": "string" },
+      "searchText": { "type": "string" },
+      "description": { "type": "string" },
+      "descriptors": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
+      "units": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
+      "portraits": {
+        "type": "object",
+        "properties": {
+          "heroSelect": { "type": "string" },
+          "leaderboard": { "type": "string" },
+          "loading": { "type": "string" },
+          "partyPanel": { "type": "string" },
+          "target": { "type": "string" },
+          "draftScreen": { "type": "string" },
+          "partyFrames": { "type": "array", "items": { "type": "string" } },
+          "minimap": { "type": "string" },
+          "targetInfo": { "type": "string" }
+        },
+        "required": ["heroSelect", "leaderboard", "loading", "partyPanel",
+          "target", "draftScreen", "partyFrames", "minimap"],
+        "additionalProperties": false
+      },
+      "life": {
+        "$ref": "#/definitions/ScalableNumber"
+      },
+      "energy": {
+        "$ref": "#/definitions/ScalableNumber"
+      },
+      "shield": {
+        "$ref": "#/definitions/ScalableNumber"
+      },
+      "roles": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
+      "expandedRole": { "type": "string" },
+      "ratings": {
+        "type": "object",
+        "properties": {
+          "complexity": { "type": "number" },
+          "damage": { "type": "number" },
+          "survivability": { "type": "number" },
+          "utility": { "type": "number" }
+        },
+        "required": ["complexity", "damage", "survivability", "utility"],
+        "additionalProperties": false
+      },
+      "weapons": {
+        "type": "array",
+        "items": { "$ref": "#/definitions/Weapon" }
+      },
+      "abilities": {
+        "type": "object",
+        "properties": {
+          "basic": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/Ability" }
+          },
+          "heroic": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/Ability" }
+          },
+          "trait": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/Ability" }
+          },
+          "mount": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/Ability" }
+          },
+          "hearth": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/Ability" }
+          },
+          "spray": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/Ability" }
+          },
+          "voice": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/Ability" }
+          },
+          "activable": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/Ability" }
+          }
+        },
+        "required": ["basic", "heroic", "trait", "mount", "spray", "voice"],
+        "additionalProperties": false
+      },
+      "subAbilities": { "$ref": "#/definitions/SubAbilityTable" },
+      "talents": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "level1": { "$ref": "#/definitions/TalentList" },
+              "level4": { "$ref": "#/definitions/TalentList" },
+              "level7": { "$ref": "#/definitions/TalentList" },
+              "level10": { "$ref": "#/definitions/TalentList" },
+              "level13": { "$ref": "#/definitions/TalentList" },
+              "level16": { "$ref": "#/definitions/TalentList" },
+              "level20": { "$ref": "#/definitions/TalentList" }
+            },
+            "required": ["level1", "level4", "level7", "level10", "level13", "level16", "level20"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "level1": { "$ref": "#/definitions/TalentList" },
+              "level2": { "$ref": "#/definitions/TalentList" },
+              "level5": { "$ref": "#/definitions/TalentList" },
+              "level8": { "$ref": "#/definitions/TalentList" },
+              "level11": { "$ref": "#/definitions/TalentList" },
+              "level14": { "$ref": "#/definitions/TalentList" },
+              "level18": { "$ref": "#/definitions/TalentList" }
+            },
+            "required": ["level1", "level2", "level5", "level8", "level11", "level14", "level18"],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "heroUnits": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/definitions/HeroUnit" }
+        }
+      }
+    },
+    "required": ["name", "unitId", "hyperlinkId", "attributeId",
+      "difficulty", "franchise", "gender", "title",
+      "releaseDate", "speed", "type", "rarity",
+      "scalingLinkId", "searchText", "description",
+      "portraits", "life", "roles", "expandedRole", "ratings",
+      "abilities", "talents"],
+    "additionalProperties": false
+  },
+
+  "ChargeNumber": {
+    "type": "object",
+    "properties": {
+      "countMax": { "type": "number" },
+      "countUse": { "type": "number" },
+      "countStart": { "type": "number" },
+      "hideCount": { "type": "boolean" },
+      "recastCooldown": { "type": "number" }
+    },
+    "required": ["countMax"],
+    "additionalProperties": false
+  },
+
+  "ScalableNumber": {
+    "type": "object",
+    "properties": {
+      "type": { "type": "string" },
+      "amount": { "type": "number" },
+      "scale": { "type": "number" },
+      "regenDelay": { "type": "number" },
+      "regenRate": { "type": "number" },
+      "regenScale": { "type": "number" }
+    },
+    "required": ["amount", "regenRate"],
+    "additionalProperties": false
+  },
+
+  "Ability": {
+    "type": "object",
+    "properties": {
+      "nameId": { "type": "string" },
+      "buttonId": { "type": "string" },
+      "name": { "type": "string" },
+      "icon": { "type": "string" },
+      "energyTooltip": { "type": "string" },
+      "cooldownTooltip": { "type": "string" },
+      "shortTooltip": { "type": "string" },
+      "fullTooltip": { "type": "string" },
+      "lifeTooltip": { "type": "string" },
+      "toggleCooldown": { "type": "number" },
+      "charges": {
+        "$ref": "#/definitions/ChargeNumber"
+      },
+      "abilityType": {
+        "$ref": "#/definitions/AbilityType"
+      },
+      "isPassive": { "type": "boolean" },
+      "isActive": { "type": "boolean" }
+    },
+    "required": ["nameId", "buttonId", "name", "icon", "fullTooltip", "abilityType"],
+    "additionalProperties": false
+  },
+
+  "TalentList": {
+    "type": "array",
+    "items": { "$ref": "#/definitions/Talent" }
+  },
+
+  "Talent": {
+    "type": "object",
+    "properties": {
+      "nameId": { "type": "string" },
+      "buttonId": { "type": "string" },
+      "name": { "type": "string" },
+      "icon": { "type": "string" },
+      "charges": { "$ref": "#/definitions/ChargeNumber" },
+      "shortTooltip": { "type": "string" },
+      "fullTooltip": { "type": "string" },
+      "cooldownTooltip": { "type": "string" },
+      "energyTooltip": { "type": "string" },
+      "abilityType": { "$ref": "#/definitions/AbilityType" },
+      "sort": { "type": "number" },
+      "toggleCooldown": { "type": "number" },
+      "isActive": { "type": "boolean" },
+      "isQuest": { "type": "boolean" },
+      "abilityTalentLinkIds": { "type": "array", "items": { "type": "string" } },
+      "prerequisiteTalentIds": { "type": "array", "items": { "type": "string" } }
+    },
+    "required": ["nameId", "buttonId", "name", "icon", "shortTooltip",
+      "fullTooltip", "abilityType", "sort"],
+    "additionalProperties": false
+  },
+
+  "AbilityType": {
+    "type": "string",
+    "enum": ["Q", "W", "E", "Heroic", "Trait", "B", "Z", "Spray", "Voice", "Active", "Passive"]
+  },
+
+  "Weapon": {
+    "type": "object",
+    "properties": {
+      "nameId": { "type": "string" },
+      "range": { "type": "number" },
+      "period": { "type": "number" },
+      "damage": { "type": "number" },
+      "damageScale": { "type": "number" }
+    },
+    "required": ["nameId", "range", "period", "damage", "damageScale"],
+    "additionalProperties": false
+  },
+
+  "HeroUnit": {
+    "type": "object",
+    "properties": {
+      "name": { "type": "string" },
+      "hyperlinkId": { "type": "string" },
+      "innerRadius": { "type": "number" },
+      "radius": { "type": "number" },
+      "sight": { "type": "number" },
+      "speed": { "type": "number" },
+      "scalingLinkId": { "type": "string" },
+      "descriptors": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
+      "units": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
+      "portraits": {
+        "type": "object",
+        "properties": {
+          "minimap": { "type": "string" },
+          "targetInfo": { "type": "string" }
+        },
+        "required": ["targetInfo", "minimap"],
+        "additionalProperties": false
+      },
+      "life": { "$ref": "#/definitions/ScalableNumber" },
+      "energy": { "$ref": "#/definitions/ScalableNumber" },
+      "weapons": {
+        "type": "array",
+        "items": { "$ref": "#/definitions/Weapon" }
+      },
+      "abilities": {
+        "type": "object",
+        "properties": {
+          "basic": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/Ability" }
+          },
+          "heroic": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/Ability" }
+          },
+          "trait": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/Ability" }
+          },
+          "hearth": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/Ability" }
+          },
+          "mount": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/Ability" }
+          },
+          "activable": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/Ability" }
+          },
+          "spray": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/Ability" }
+          },
+          "voice": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/Ability" }
+          }
+        },
+        "additionalProperties": false
+      },
+      "subAbilities": { "$ref": "#/definitions/SubAbilityTable" }
+    },
+    "required": ["name", "sight", "speed", "portraits", "life"],
+    "additionalProperties": false
+  },
+
+  "SubAbilityTable": {
+    "type": "array",
+    "items": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Ability" }
+        }
+      }
+    }
+  }
+}

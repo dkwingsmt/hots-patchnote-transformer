@@ -1,0 +1,27 @@
+{
+  "Main": {
+    "title": "Skins",
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/definitions/Skin"
+    }
+  },
+
+  "Skin": {
+    "type": "object",
+    "properties": {
+      "name": { "type": "string" },
+      "hyperlinkId": { "type": "string" },
+      "attributeId": { "type": "string" },
+      "rarity": { "type": "string" },
+      "releaseDate": { "type": "string", "format": "date" },
+      "sortName": { "type": "string" },
+      "searchText": { "type": "string" },
+      "description": { "type": "string" },
+      "features": { "type": "array", "items": { "type": "string" } }
+    },
+    "required": ["hyperlinkId", "attributeId", "rarity",
+      "releaseDate", "description"],
+    "additionalProperties": false
+  }
+}

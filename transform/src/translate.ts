@@ -156,7 +156,7 @@ function translatePreset(origin: string): string {
     [/^available starting the week of ([^ ]+ [0-9]+) until ([^ ]+ [0-9]+).?$/i,
       (r: RegExpMatchArray) => `将从${moment(r[1], 'MMM D').format('M月D日')}当周开始上线，${moment(r[2], 'MMM D').format('M月D日')}截止。`],
 
-    [/^for ([\d.]+) seconds?$/i, 
+    [/^for ([\d.]+) seconds?$/i,
       (r: RegExpMatchArray) => `，持续${r[1]}秒`],
   ];
 
@@ -713,7 +713,7 @@ export function translateChangeBy(origin: string): string | null {
 function translateToken(origin: string) {
   const queryResult = i18nDict[toI18nKey(origin)];
   if (queryResult) {
-    return queryResult[0][0];
+    return queryResult;
   }
 
   const tryChangeFromTo = translateChangeFromTo(origin);

@@ -1,0 +1,28 @@
+{
+  "Main": {
+    "title": "Mounts",
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/definitions/Mount"
+    }
+  },
+
+  "Mount": {
+    "type": "object",
+    "properties": {
+      "name": { "type": "string" },
+      "hyperlinkId": { "type": "string" },
+      "attributeId": { "type": "string" },
+      "rarity": { "type": "string" },
+      "type": { "type": "string" },
+      "category": { "type": "string" },
+      "event": { "type": "string" },
+      "releaseDate": { "type": "string", "format": "date" },
+      "sortName": { "type": "string" },
+      "searchText": { "type": "string" },
+      "description": { "type": "string" }
+    },
+    "required": ["hyperlinkId", "attributeId", "rarity", "releaseDate"],
+    "additionalProperties": false
+  }
+}
