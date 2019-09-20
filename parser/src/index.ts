@@ -96,7 +96,7 @@ async function main() {
       alias: 'n',
       type: 'array',
       describe: 'The name of schema files and data files that will be processed',
-      default: ['herodata'],
+      default: ['herodata', 'heroskindata', 'mountdata'],
     })
     .options('build', {
       alias: 'b',
@@ -123,7 +123,11 @@ async function main() {
         outputPath: outputPath,
       });
     });
-  }).catch((err: Error) => console.error(err));
+  });
 }
 
-main();
+main()
+  .catch((err: Error) => {
+    console.error(err);
+    process.exit(1);
+  });

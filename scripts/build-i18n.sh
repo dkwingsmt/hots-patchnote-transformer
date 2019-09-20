@@ -34,8 +34,8 @@ yarn workspace @html2nga/hots-parser build \
     -s $SCHEMA_DIR \
     -o $TEMP_TYPED_DATA_DIR \
     -b $BUILD \
-&& rm -rf $TYPED_DATA_DIR \
-&& mv $TEMP_TYPED_DATA_DIR $TYPED_DATA_DIR  \
+&& rm -rf $TYPED_DATA_DIR/*.ts \
+&& mv $TEMP_TYPED_DATA_DIR/*.ts $TYPED_DATA_DIR  \
 && yarn workspace @html2nga/gen-i18n build \
 && yarn workspace @html2nga/gen-i18n start -o $I18N_PATH \
 && echo 'Done.'

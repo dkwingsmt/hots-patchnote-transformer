@@ -2,10 +2,15 @@ import { writeFile, readJSON, readdir } from 'fs-extra';
 import { dirname } from 'path';
 import _ from 'lodash';
 import yargs from 'yargs';
-import heroesEn, { Hero, Ability, Talent } from './external-data/herodata_enus';
-import heroesZh from './external-data/herodata_zhcn';
+
 import mapDict from './predefined/map.json';
 import rolesDict from './predefined/roles.json';
+import heroesEn, { Hero, Ability, Talent } from './external-data/herodata_enus';
+import heroesZh from './external-data/herodata_zhcn';
+import skinsEn from './external-data/heroskindata_enus';
+import skinsZh from './external-data/heroskindata_zhcn';
+import mountsEn from './external-data/mountdata_enus';
+import mountsZh from './external-data/mountdata_zhcn';
 
 interface IArg {
   to: string;
@@ -65,6 +70,10 @@ function compareObject<T extends Record<string, any>>(
   });
 }
 
+function mergeMany<V>(records: Record<string, V>[]): Record<string, V> {
+  return _.merge({}, ...records);
+}
+
 function indexAbilities(
   abilities: (Ability | undefined)[] | undefined,
 ): Record<string, Ability> {
@@ -95,10 +104,6 @@ function collectSubabilities(
     ),
   );
   return indexAbilities(abilities);
-}
-
-function mergeMany<V>(records: Record<string, V>[]): Record<string, V> {
-  return _.merge({}, ...records);
 }
 
 function collectHeroUnitAbilities(
@@ -154,11 +159,39 @@ function buildDictFromHeroes(): Dict {
   return _.zipObject(keys, values);
 }
 
+function buildDictFromSkins(): Dict {
+  const entries: [string, string][] = [];
+  compareObject(skinsEn, skinsZh, '',
+    (skinEn, skinZh, keySkin, pathSkin) => {
+      if (skinEn.name != null && skinZh.name != null) {
+        entries.push([skinEn.name, skinZh.name]);
+      }
+    }
+  )
+  const [keys, values] = _.unzip(entries);
+  return _.zipObject(keys, values);
+}
+
+function buildDictFromMounts(): Dict {
+  const entries: [string, string][] = [];
+  compareObject(mountsEn, mountsZh, '',
+    (mountEn, mountZh, keySkin, pathSkin) => {
+      if (mountEn.name != null && mountZh.name != null) {
+        entries.push([mountEn.name, mountZh.name]);
+      }
+    }
+  )
+  const [keys, values] = _.unzip(entries);
+  return _.zipObject(keys, values);
+}
+
 function buildDict(): Dict {
-  return _.merge({},
+  return mergeMany([
     buildDictFromPredefined(),
     buildDictFromHeroes(),
-  );
+    buildDictFromSkins(),
+    buildDictFromMounts(),
+  ]);
 }
 
 async function main({ to, out }: IArg) {
