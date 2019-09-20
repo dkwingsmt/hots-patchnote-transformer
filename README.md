@@ -10,22 +10,22 @@ yarn run check-tools # You may need sudo here
 ```
 
 ### Rebuild i18n
-Only available on macOS.
+The i18n dictionary is included in the repo. To update it with the latest client, follow the following steps on a macOS system.
 
 #### Extract data
-Build with live:
+To build with live, where `<data dir>` is an arbitrary temporary directory for the output:
 ```
 yarn run extract-data <data dir>
 ```
 
-Build with PTR:
+To build with PTR:
 ```
 PTR=true yarn run extract-data <data dir>
 ```
 
-Extracting mod can save time for future extracts:
+You can also extract the mod before extracting, which saves time for multiple extracts:
 ```
-dotnet heroes-data extract <game install dir> -o <mod base>
+dotnet heroes-data extract <client dir> -o <mod base>
 MOD=<mod dir> yarn run extract-data <data dir>
 ```
 
@@ -33,6 +33,8 @@ MOD=<mod dir> yarn run extract-data <data dir>
 ```
 yarn run build-i18n <data dir>
 ```
+
+And `transform` will have the updated i18n file.
 
 ### Run
 ```
