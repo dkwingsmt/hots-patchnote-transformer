@@ -2,11 +2,15 @@
 import React, { useState, useReducer, useRef, useCallback, useMemo } from 'react';
 import _ from 'lodash';
 import fuzz from 'fuzzball';
+import copy from 'copy-to-clipboard';
 
 import Grid from '@material-ui/core/Grid';
+import IconButton from '@material-ui/core/IconButton';
 import { withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { Table, TableCell, TableBody, TableRow } from '@material-ui/core';
+
+import FileCopy from '@material-ui/icons/FileCopy';
 
 import { i18n } from '@html2nga/hots-transform';
 
@@ -33,12 +37,65 @@ const findResults = (choices) => (text) => {
       {
         processor: (choice) => choice[0] + " " + choice[1],
         limit: 10,
-        cutoff: 20,
+        cutoff: 40,
       }
     ),
     ([result, score, key]) => result,
   );
 }
+
+function _CopiableCell({ text, classes }) {
+  return (
+    <TableCell
+      className={classes.cell}
+    >
+      <div className={classes.cellBlock}>
+        <div className={classes.text}>
+          {text}
+        </div>
+        <div className={classes.button}>
+          <IconButton
+            size="small"
+            onClick={() => {
+              copy(text);
+            }}
+          >
+            <FileCopy />
+          </IconButton>
+        </div>
+      </div>
+    </TableCell>
+  )
+}
+
+const copiableCellStyles = {
+  cell: {
+    '&:not(:hover) $button': {
+      display: 'none',
+    },
+
+    '&:hover': {
+      backgroundColor: 'rgba(50, 50, 127, 0.05)',
+    },
+  },
+
+  cellBlock: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+
+  text: {
+    flex: '1 1 0',
+  },
+
+  button: {
+    flex: '0 0 auto',
+    zoom: 0.7,
+    margin: -20,
+  },
+}
+
+const CopiableCell = withStyles(copiableCellStyles)(_CopiableCell);
 
 function _Glossaries({ classes }) {
   const [text, setText] = useState('');
@@ -69,20 +126,20 @@ function _Glossaries({ classes }) {
           <Table>
             {displayNormalTable && (
               <colgroup>
-                  <col style={{width:'60%'}}/>
-                  <col style={{width:'40%'}}/>
+                <col style={{width:'60%'}}/>
+                <col style={{width:'40%'}}/>
               </colgroup>
             )}
             <TableBody>
               {displayNormalTable ? (
                 results.map((result) => (
                   <TableRow key={result[0]}>
-                    <TableCell>
-                      {result[0]}
-                    </TableCell>
-                    <TableCell>
-                      {result[1]}
-                    </TableCell>
+                    <CopiableCell
+                      text={result[0]}
+                    />
+                    <CopiableCell
+                      text={result[1]}
+                    />
                   </TableRow>
                 ))
               ) : (
