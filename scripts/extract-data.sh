@@ -32,8 +32,19 @@ dotnet heroes-data "$MOD" -o "$1" -d 3 \
   -e herodata -e heroskins -e mounts \
   | tee $LOG
 
+if [ $? -ne 0 ]; then
+exit $?
+fi
+if [ $(grep -c 'Error' $LOG) -ne 0 ]; then
+exit 1
+fi
+
 # Get build number
 BUILD=$(cat $LOG | grep -E 'Hots Version Build|Hots build' | tr '.' ' ' | tr ' ' '\n' | grep -E '\d{5}')
+
+if [ -z "$BUILD" ]; then
+exit 1
+fi
 
 echo $BUILD > $OUT/BUILD
 echo Successfully extracted build $BUILD to $OUT
