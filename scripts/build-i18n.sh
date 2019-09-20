@@ -24,16 +24,20 @@ fi
 SCRIPTS_PATH="$( cd "$(dirname "$0")" ; pwd -P )/"
 PROJECT_BASE=$(abs_path "${SCRIPTS_PATH}/..")
 SCHEMA_DIR="$PROJECT_BASE/parser/schemas"
-TEMP_OUTPUT_DIR="$PROJECT_BASE/tmp/typed-data"
-OUTPUT_DIR="$PROJECT_BASE/gen-i18n/src/external-data"
+TEMP_TYPED_DATA_DIR="$PROJECT_BASE/tmp/typed-data"
+TYPED_DATA_DIR="$PROJECT_BASE/gen-i18n/src/external-data"
+I18N_PATH="$PROJECT_BASE/transform/src/external/i18n.ts"
 
 yarn workspace @html2nga/hots-parser build \
 && yarn workspace @html2nga/hots-parser start \
     -d "$DATA_DIR/json" \
     -s $SCHEMA_DIR \
-    -o $TEMP_OUTPUT_DIR \
+    -o $TEMP_TYPED_DATA_DIR \
     -b $BUILD \
-&& rm -rf $OUTPUT_DIR \
-&& mv $TEMP_OUTPUT_DIR $OUTPUT_DIR
+&& rm -rf $TYPED_DATA_DIR \
+&& mv $TEMP_TYPED_DATA_DIR $TYPED_DATA_DIR  \
+&& yarn workspace @html2nga/gen-i18n build \
+&& yarn workspace @html2nga/gen-i18n start -o $I18N_PATH \
+&& echo 'Done.'
 
 exit $?

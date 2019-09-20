@@ -15,7 +15,7 @@ interface IArg {
 type Dict = Record<string, string>;
 
 function sanitizeKey(k: string): string {
-  return _.lowerCase(k).replace('\'', '');
+  return _.lowerCase(k).replace(/[’.'!?]/g, '');
 }
 
 function formatContent(dict: Dict): string {

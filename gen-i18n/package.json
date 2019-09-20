@@ -1,5 +1,5 @@
 {
-  "name": "hots-gen-i18n",
+  "name": "@html2nga/gen-i18n",
   "version": "0.0.1",
   "main": "build/index.js",
   "author": "DKWings",
@@ -7,9 +7,8 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "start": "./start.sh",
     "test": "echo No tests",
-    "combine": "node ./build/index.js"
+    "start": "node ./build/index.js"
   },
   "devDependencies": {
     "@types/fs-extra": "^5.0.4",

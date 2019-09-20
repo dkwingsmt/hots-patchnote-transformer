@@ -80,5 +80,5 @@ export function findNearestColor(hex: string) {
     name,
   ]);
 
-  return (_.minBy(distances, 0) || ngaColors[0])[1];
+  return (_.minBy(distances, 0) || _.values(ngaColors)[0])[1];
 }

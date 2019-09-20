@@ -48,7 +48,7 @@
     "eslint-config-airbnb": "^13.0.0",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^2.2.3",
-    "eslint-plugin-react": "^6.10.0",
+    "eslint-plugin-react": "^7.14.0",
     "eslint-plugin-react-hooks": "^0.0.0",
     "gh-pages": "^2.0.1",
     "ts-node": "^7.0.1",
