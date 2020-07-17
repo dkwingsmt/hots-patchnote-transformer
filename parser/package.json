@@ -24,7 +24,7 @@
     "bluebird": "^3.5.3",
     "fs-extra": "^8.1.0",
     "json-schema-to-typescript": "^7.1.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.19",
     "yargs": "^14.0.0"
   }
 }
