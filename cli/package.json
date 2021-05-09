@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@html2nga/hots-transform": "^0.0.1",
-    "lodash": "^4.17.10"
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "jest": "^23.6.0",
